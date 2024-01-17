@@ -8,7 +8,6 @@ import 'package:nsideas/subPage.dart';
 
 import 'package:path_provider/path_provider.dart';
 
-import 'authPage.dart';
 import 'functions.dart';
 
 class searchBar extends StatefulWidget {
@@ -39,7 +38,6 @@ class _searchBarState extends State<searchBar> {
 
   @override
   Widget build(BuildContext context) {
-    double Size = size(context);
     return Scaffold(
         backgroundColor: Colors.black,
         body: SafeArea(
@@ -68,10 +66,10 @@ class _searchBarState extends State<searchBar> {
                       child: Row(
                         children: [
                           Padding(
-                            padding: EdgeInsets.only(right: Size * 10),
+                            padding: EdgeInsets.only(right:  10),
                             child: Icon(
                               Icons.search,
-                              size: Size * 25,
+                              size:  25,
                               color: Colors.white,
                             ),
                           ),
@@ -85,7 +83,7 @@ class _searchBarState extends State<searchBar> {
                               style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w400,
-                                  fontSize: Size * 16),
+                                  fontSize:  16),
                               decoration: InputDecoration(
                                   border: InputBorder.none,
                                   hintText: 'Search Bar',
@@ -106,11 +104,11 @@ class _searchBarState extends State<searchBar> {
                       },
                       child: Padding(
                         padding: EdgeInsets.only(
-                          right: Size * 10,
+                          right:  10,
                         ),
                         child: Icon(
                           Icons.clear,
-                          size: Size * 35,
+                          size:  35,
                           color: Colors.white,
                         ),
                       ),

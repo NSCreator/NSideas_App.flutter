@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:nsideas/textFeild.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'functions.dart';
 
 Future<List<ProjectConvertor>> getBranchStudyMaterials(bool isLoading) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -60,7 +59,8 @@ Future CreateSubject({
     ComponentsAndSupplies: ComponentsAndSupplies,
     type: type,
     tags: tags,
-    tableOfContent: tableOfContent, appAndPlatforms: appAndPlatforms,
+    tableOfContent: tableOfContent,
+    appAndPlatforms: appAndPlatforms,
   );
 
   final jsonData = tripData.toJson();
@@ -78,7 +78,9 @@ class ProjectConvertor {
   final ImagesConvertor Images;
   final List tags;
   final List<DescriptionConvertor> description;
-  final List<convertorForTRCSRC> ComponentsAndSupplies,toolsRequired,appAndPlatforms;
+  final List<convertorForTRCSRC> ComponentsAndSupplies,
+      toolsRequired,
+      appAndPlatforms;
 
   ProjectConvertor({
     required this.id,
@@ -108,8 +110,8 @@ class ProjectConvertor {
             ComponentsAndSupplies.map((oldPaper) => oldPaper.toJson()).toList(),
         "toolsRequired":
             toolsRequired.map((textBook) => textBook.toJson()).toList(),
-    "appAndPlatforms":
-    appAndPlatforms.map((textBook) => textBook.toJson()).toList(),
+        "appAndPlatforms":
+            appAndPlatforms.map((textBook) => textBook.toJson()).toList(),
         "Images": Images.toJson(),
       };
 
@@ -161,44 +163,39 @@ class HeadingConvertor {
 }
 
 class DescriptionConvertor {
-  String id;
-  final String data;
+  final String heading;
   final List<TableConvertor> table;
-  final List<String> subData, images, files;
+  final List<String> points, images;
+  final List<CodeFilesConvertor> files;
 
   DescriptionConvertor({
-    this.id = "",
-    required this.data,
-    required this.subData,
+    required this.heading,
+    required this.points,
     required this.images,
     required this.files,
     required this.table,
   });
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "data": data,
-    "subData": subData,
-    'images': images,
-    'files': files,
+    "heading": heading,
+    "points": points.toList(),
+    'images': images.toList(),
+    'files': files.map((codeFilesConvertor) => codeFilesConvertor.toJson()).toList(),
     'table': table.map((tableConvertor) => tableConvertor.toJson()).toList(),
   };
 
-  static DescriptionConvertor fromJson(Map<String, dynamic> json) =>
-      DescriptionConvertor(
-        id: json['id'],
-        data: json["data"],
-        subData: List<String>.from(json["subData"]),
-        images: List<String>.from(json['images']),
-        files: List<String>.from(json['files']),
-        table: TableConvertor.fromMapList(json["table"]),
-      );
+  static DescriptionConvertor fromJson(Map<String, dynamic> json) => DescriptionConvertor(
+    heading: json["heading"],
+    points: List<String>.from(json["points"]),
+    images: List<String>.from(json['images']),
+    files: (json['files'] as List<dynamic>? ?? []).map((item) => CodeFilesConvertor.fromJson(item)).toList(),
+    table: TableConvertor.fromMapList(json['table'] ?? []), // Change here
+  );
 
   static List<DescriptionConvertor> fromMapList(List<dynamic> list) {
     return list.map((item) => fromJson(item)).toList();
   }
 }
-
 class convertorForTRCSRC {
   final String heading, link, image;
 

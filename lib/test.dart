@@ -1,12 +1,15 @@
 
+
+import 'package:carousel_slider/carousel_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:nsideas/projects.dart';
+import 'package:nsideas/textFeild.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'functions.dart';
 import 'homePage.dart';
 
-class DescriptionCreator extends StatefulWidget {
+class SensorsCreator extends StatefulWidget {
   final String id;
 
   String data;
@@ -15,7 +18,7 @@ class DescriptionCreator extends StatefulWidget {
   String table;
   String files;
 
-  DescriptionCreator({
+  SensorsCreator({
     Key? key,
     required this.id,
     this.data = "",
@@ -26,10 +29,10 @@ class DescriptionCreator extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<DescriptionCreator> createState() => _DescriptionCreatorState();
+  State<SensorsCreator> createState() => _SensorsCreatorState();
 }
 
-class _DescriptionCreatorState extends State<DescriptionCreator> {
+class _SensorsCreatorState extends State<SensorsCreator> {
   List<String> pointsList = [];
   final TextEditingController _pointsController = TextEditingController();
   int selectedPointIndex = -1;
@@ -399,11 +402,11 @@ class _DescriptionCreatorState extends State<DescriptionCreator> {
                     child: ListTile(
                       title: selectedPointIndex == index
                           ? TextField(
-                              textInputAction: TextInputAction.done,
-                              maxLines: null,
-                              controller: _pointsController,
-                              onEditingComplete: saveEditedPoint,
-                            )
+                        textInputAction: TextInputAction.done,
+                        maxLines: null,
+                        controller: _pointsController,
+                        onEditingComplete: saveEditedPoint,
+                      )
                           : Text(pointsList[index]),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -494,7 +497,7 @@ class _DescriptionCreatorState extends State<DescriptionCreator> {
                         ),
                       ),
                       defaultVerticalAlignment:
-                          TableCellVerticalAlignment.middle,
+                      TableCellVerticalAlignment.middle,
                       columnWidths: const {
                         0: FractionColumnWidth(0.2),
                         1: FractionColumnWidth(0.6),
@@ -555,13 +558,13 @@ class _DescriptionCreatorState extends State<DescriptionCreator> {
                         color: Colors.white54,
                         borderRadius: dataIndex == tableList.length - 1
                             ? BorderRadius.only(
-                                bottomLeft: Radius.circular(10),
-                                bottomRight: Radius.circular(10),
-                              )
+                          bottomLeft: Radius.circular(10),
+                          bottomRight: Radius.circular(10),
+                        )
                             : BorderRadius.circular(0),
                       ),
                       defaultVerticalAlignment:
-                          TableCellVerticalAlignment.middle,
+                      TableCellVerticalAlignment.middle,
                       columnWidths: const {
                         0: FractionColumnWidth(0.2),
                         1: FractionColumnWidth(0.6),
@@ -1008,221 +1011,582 @@ class _DescriptionCreatorState extends State<DescriptionCreator> {
   }
 }
 
-class TableConvertor {
-  String col0;
-  String col1;
 
-  TableConvertor({required this.col0, required this.col1});
-
-  Map<String, dynamic> toJson() => {
-        "col0": col0,
-        "col1": col1,
-      };
-
-  static TableConvertor fromJson(Map<String, dynamic> json) => TableConvertor(
-        col0: json['col0'] ?? "",
-        col1: json["col1"] ?? "",
-      );
-
-  static List<TableConvertor> fromMapList(List<dynamic> list) {
-    return list
-        .map((item) => TableConvertor.fromJson(item))
-        .toList(); // Change here
-  }
-}
-
-class CodeFilesConvertor {
-  String heading, type;
-  String data;
-
-  CodeFilesConvertor(
-      {required this.heading, required this.data, required this.type});
-
-  Map<String, dynamic> toJson() => {
-        "heading": heading,
-        "data": data,
-        "type": type,
-      };
-
-  static CodeFilesConvertor fromJson(Map<String, dynamic> json) =>
-      CodeFilesConvertor(
-        heading: json['heading'] ?? "",
-        data: json["data"] ?? "",
-        type: json["type"] ?? "",
-      );
-
-  static List<CodeFilesConvertor> fromMapList(List<dynamic> list) {
-    return list.map((item) => fromJson(item)).toList();
-  }
-}
-
-class arduinoBoardCreator extends StatefulWidget {
-  arduinoBoardCreator({
-    Key? key,
-  }) : super(key: key);
+class sensorsAndComponents extends StatefulWidget {
+  const sensorsAndComponents({Key? key}) : super(key: key);
 
   @override
-  State<arduinoBoardCreator> createState() => _arduinoBoardCreatorState();
+  State<sensorsAndComponents> createState() => _sensorsAndComponentsState();
 }
 
-class _arduinoBoardCreatorState extends State<arduinoBoardCreator> {
-  final shortController = TextEditingController();
-  final fullController = TextEditingController();
-  final AboutController = TextEditingController();
-  final PhotoUrl = TextEditingController();
-  final CircuitDiagram = TextEditingController();
+class _sensorsAndComponentsState extends State<sensorsAndComponents> {
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    shortController.dispose();
-    AboutController.dispose();
-    PhotoUrl.dispose();
-    CircuitDiagram.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            backButton(
-              text: "Arduino Board",
+
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+
+          Padding(
+            padding:  EdgeInsets.only(left: 15,bottom: 15),
+            child: Text(
+              "Sensors",
+              style: TextStyle(color: Colors.white, fontSize:20),
             ),
-            TextFieldContainer(
-              heading: "Short Heading",
-              child: TextFormField(
-                controller: shortController,
-                textInputAction: TextInputAction.next,
-                style: TextStyle(color: Colors.black, fontSize: 20),
-                decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintText: 'Short',
-                    hintStyle: TextStyle(color: Colors.black54)),
-              ),
-            ),
-            TextFieldContainer(
-              heading: "Full Heading",
-              child: TextFormField(
-                controller: fullController,
-                textInputAction: TextInputAction.next,
-                style: TextStyle(color: Colors.black, fontSize: 20),
-                decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintText: 'Full',
-                    hintStyle: TextStyle(color: Colors.black54)),
-              ),
-            ),
-            TextFieldContainer(
-              heading: "Description",
-              child: TextFormField(
-                controller: AboutController,
-                textInputAction: TextInputAction.next,
-                style: TextStyle(color: Colors.black, fontSize: 20),
-                decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintText: 'Description',
-                    hintStyle: TextStyle(color: Colors.black54)),
-              ),
-            ),
-            TextFieldContainer(
-              heading: "Images",
-              child: TextFormField(
-                controller: PhotoUrl,
-                textInputAction: TextInputAction.next,
-                style: TextStyle(color: Colors.black, fontSize: 20),
-                decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintText: 'Images',
-                    hintStyle: TextStyle(color: Colors.black54)),
-              ),
-            ),
-            TextFieldContainer(
-              heading: "Board Pin Out ",
-              child: TextFormField(
-                controller: CircuitDiagram,
-                textInputAction: TextInputAction.next,
-                style: TextStyle(color: Colors.black, fontSize: 20),
-                decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintText: 'Pin Out',
-                    hintStyle: TextStyle(color: Colors.black54)),
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Row(
-              children: [
-                const Spacer(),
-                InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: Colors.white.withOpacity(0.5),
-                      border: Border.all(color: Colors.white),
-                    ),
-                    child: const Padding(
-                      padding: EdgeInsets.only(
-                          left: 10, right: 10, top: 5, bottom: 5),
-                      child: Text("Back"),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                InkWell(
-                    onTap: () async {
-                      String id = getID();
-                      await FirebaseFirestore.instance
-                          .collection('others')
-                          .doc("arduinoBoards")
-                          .collection("boards")
-                          .doc(id)
-                          .set(arduinoBoardsConvertor(
-                        id: id,
-                        heading: HeadingConvertor(
-                          full: fullController.text,
-                          short: shortController.text,
-                        ),
-                        images: [PhotoUrl.text],
-                        about: AboutController.text,
-                        pinDiagrams: [CircuitDiagram.text], descriptions: [],
-                      ).toJson());
-                      Navigator.pop(context);
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        color: Colors.white.withOpacity(0.5),
-                        border: Border.all(color: Colors.white),
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.only(
-                            left: 10, right: 10, top: 5, bottom: 5),
-                        child: Text("Create"),
-                      ),
-                    )),
-                const SizedBox(
-                  width: 20,
-                ),
-              ],
-            )
-          ],
-        ),
+          ),
+          StreamBuilder<List<sensorsConvertor>>(
+            stream: readsensors(),
+            builder: (context, snapshot) {
+              final Subjects = snapshot.data;
+              switch (snapshot.connectionState) {
+                case ConnectionState.waiting:
+                  return const Center(
+                      child: CircularProgressIndicator(
+                        strokeWidth: 0.3,
+                        color: Colors.cyan,
+                      ));
+                default:
+                  if (snapshot.hasError) {
+                    return const Text("Error with server");
+                  } else {
+                    return ListView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: Subjects!.length,
+                      shrinkWrap: true,
+                      itemBuilder: (BuildContext context, int index) {
+                        final SubjectsData = Subjects[index];
+
+                        return InkWell(
+                          child: Padding(
+                            padding:  EdgeInsets.only(
+                                left: 10, right: 10, bottom: 4),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.08),
+                                borderRadius:  BorderRadius.all(
+                                    Radius.circular(15)
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    child: ImageShowAndDownload(
+                                      image: SubjectsData.photoUrl.split(";").first,
+                                      id: SubjectsData.id,
+                                    ),
+                                    height: 70,
+                                    width: 110,
+                                  ),
+                                  Expanded(
+                                      child: Padding(
+                                        padding:
+                                        EdgeInsets.all(8.0),
+                                        child: Text(
+                                          SubjectsData.name,
+                                          style:  TextStyle(
+                                              fontSize: 20,
+                                              color: Colors.white),
+                                          maxLines: 2,
+                                          overflow:
+                                          TextOverflow.ellipsis,
+                                        ),
+                                      ))
+                                ],
+                              ),
+                            ),
+                          ),
+                          onTap: () {
+                            FirebaseFirestore.instance
+                                .collection("sensors")
+                                .doc(SubjectsData
+                                .id) // Replace "documentId" with the ID of the document you want to retrieve
+                                .get()
+                                .then((DocumentSnapshot snapshot) async {
+                              if (snapshot.exists) {
+                                var data = snapshot.data();
+                                if (data != null &&
+                                    data is Map<String, dynamic>) {
+                                  List<String> images = [];
+                                  images = SubjectsData.photoUrl.split(";");
+                                  images.addAll(
+                                      data['pinDiagram'].toString().split(";"));
+
+
+                                  Navigator.push(
+                                    context,
+                                    PageRouteBuilder(
+                                      transitionDuration:
+                                      const Duration(milliseconds: 300),
+                                      pageBuilder: (context, animation,
+                                          secondaryAnimation) =>
+                                          sensor(
+                                            pinDiagram: data['pinDiagram'],
+                                            id: SubjectsData.id,
+                                            name: SubjectsData.name,
+                                            description: data['description'],
+                                            photoUrl: SubjectsData.photoUrl,
+                                            pinConnection: data['pinConnection'],
+                                            technicalParameters: data['technicalParameters'],
+                                          ),
+                                      transitionsBuilder: (context, animation,
+                                          secondaryAnimation, child) {
+                                        final fadeTransition = FadeTransition(
+                                          opacity: animation,
+                                          child: child,
+                                        );
+
+                                        return Container(
+                                          color: Colors.black
+                                              .withOpacity(animation.value),
+                                          child: AnimatedOpacity(
+                                              duration:
+                                              Duration(milliseconds: 300),
+                                              opacity: animation.value
+                                                  .clamp(0.3, 1.0),
+                                              child: fadeTransition),
+                                        );
+                                      },
+                                    ),
+                                  );
+                                }
+                              } else {
+                                print("Document does not exist.");
+                              }
+                            }).catchError((error) {
+                              print(
+                                  "An error occurred while retrieving data: $error");
+                            });
+                          },
+                        );
+                      },
+                    );
+                  }
+              }
+            },
+          ),
+          SizedBox(
+            height: 150,
+          )
+        ],
       ),
     );
   }
 }
+class sensor extends StatefulWidget {
+  String description,photoUrl,name,id,technicalParameters,pinDiagram,pinConnection;
+
+  sensor({Key? key, required this.description,required this.photoUrl,required this.id,required this.name,required this.pinConnection,required this.pinDiagram,required this.technicalParameters}) : super(key: key);
+
+  @override
+  State<sensor> createState() => _sensorState();
+}
+
+class _sensorState extends State<sensor> {
+  List images = [];
+  CarouselController buttonCarouselController = CarouselController();
+  int currentPos = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    images = widget.photoUrl.split(",");
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    return backGroundImage(
+        text: widget.name,
+        child:    Column(
+
+          children: [
+            scrollingImages(
+              images: images, id: widget.id,isZoom: true,
+            ),
+
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 20),
+              child: Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(3.0),
+                    decoration: BoxDecoration(color: Colors.orangeAccent),
+                    child: Center(
+                      child: Text(
+                        "About Sensor",
+                        style:  TextStyle(
+                            color: Colors.black,
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding:  EdgeInsets.symmetric(vertical: 20,horizontal: 10),
+                    child: Text(
+                      "          ${widget.description}",
+                      style:  TextStyle(color: Colors.white, fontSize: 18),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding:  EdgeInsets.symmetric(horizontal: 8, vertical: 20),
+              child: Column(
+                children: [
+                  Container(
+                    padding:  EdgeInsets.all(3.0),
+                    decoration: BoxDecoration(color: Colors.orangeAccent),
+                    child: Center(
+                      child: Text(
+                        "Technical Parameters",
+                        style:  TextStyle(
+                            color: Colors.black,
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                      padding:  EdgeInsets.symmetric(vertical: 20,horizontal: 5),
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: widget.technicalParameters
+                            .split(";")
+                            .length +
+                            1,
+                        itemBuilder: (context, index) {
+                          if (index == 0) {
+                            return Table(
+                              border: TableBorder.all(
+                                  width: 0.8,
+                                  color: Colors.white70,
+                                  borderRadius: BorderRadius.only(
+                                      topRight: Radius.circular(10),
+                                      topLeft: Radius.circular(10))),
+                              defaultVerticalAlignment:
+                              TableCellVerticalAlignment.middle,
+                              columnWidths: {
+                                0: FractionColumnWidth(0.5),
+                                1: FractionColumnWidth(0.5),
+                              },
+                              children: [
+                                TableRow(
+                                  decoration: BoxDecoration(
+                                      borderRadius:
+                                      BorderRadius.only(
+                                          topRight: Radius
+                                              .circular(10),
+                                          topLeft: Radius
+                                              .circular(
+                                              10)),
+                                      color:
+                                      Colors.grey.withOpacity(0.3)),
+                                  children: [
+                                    Padding(
+                                      padding:  EdgeInsets.all(8.0),
+                                      child: Text(
+                                        textAlign: TextAlign.center,
+                                        'Technical Parameters',
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.orange,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding:  EdgeInsets.all(8.0),
+                                      child: Text(
+                                        textAlign: TextAlign.center,
+                                        'Description',
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.orange,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            );
+                          } else {
+                            String subTechnicalParameters = widget
+                                .technicalParameters
+                                .split(";")[index - 1];
+                            return Table(
+                              border: TableBorder.all(
+                                  width: 0.5,
+                                  color: Colors.white54,
+                                  borderRadius: index ==
+                                      widget.technicalParameters
+                                          .split(";")
+                                          .length
+                                      ? BorderRadius.only(
+                                      bottomLeft: Radius.circular(10),
+                                      bottomRight:
+                                      Radius.circular(10))
+                                      : BorderRadius.circular(0)),
+                              defaultVerticalAlignment:
+                              TableCellVerticalAlignment.middle,
+                              columnWidths: {
+                                0: FractionColumnWidth(0.5),
+                                1: FractionColumnWidth(0.5),
+                              },
+                              children: [
+                                TableRow(
+                                  children: [
+                                    TableCell(
+                                      child: Padding(
+                                        padding:
+                                        EdgeInsets.all(8.0),
+                                        child: Text(
+                                          textAlign: TextAlign.center,
+                                          subTechnicalParameters
+                                              .split(":")
+                                              .first,
+                                          style: TextStyle(
+                                              color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                    TableCell(
+                                      child: Padding(
+                                        padding:
+                                        EdgeInsets.all(8.0),
+                                        child: Text(
+                                            textAlign: TextAlign.center,
+                                            subTechnicalParameters
+                                                .split(":")
+                                                .last,
+                                            style: TextStyle(
+                                                color: Colors.white)),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            );
+                          }
+                        },
+                      )),
+
+                  if (widget.pinDiagram.isNotEmpty)
+                    Padding(
+                      padding:  EdgeInsets.symmetric(vertical: 20),
+                      child: Column(
+                        children: [
+                          Text(
+                            "PinOut",
+                            style: TextStyle(
+                                color: Colors.orangeAccent,
+                                fontSize: 25,
+                                fontWeight: FontWeight.w500),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 20),
+                            child: Container(
+                              height: 2,
+                              width: 30,
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(5)),
+                            ),
+                          ),
+                          scrollingImages(
+                            images: widget.pinDiagram.split(";"), id: widget.id,isZoom: true,
+                          ),
+                        ],
+                      ),
+                    ),
+                  Padding(
+                      padding:  EdgeInsets.symmetric(horizontal: 50),
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount:
+                        widget.pinConnection.split(";").length +
+                            1, // Number of rows including the header
+                        itemBuilder: (context, index) {
+                          if (index == 0) {
+                            return Column(
+                              children: [
+                                Text(
+                                  "Pin Connections",
+                                  style: TextStyle(
+                                      color: Colors.orangeAccent,
+                                      fontSize: 25,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                                Padding(
+                                  padding:
+                                  EdgeInsets.only(bottom: 20),
+                                  child: Container(
+                                    height: 2,
+                                    width: 60,
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius:
+                                        BorderRadius.circular(5)),
+                                  ),
+                                ),
+                                Table(
+                                  border: TableBorder.all(
+                                      width: 0.8,
+                                      color: Colors.white70,
+
+                                      borderRadius: BorderRadius.only(
+                                          topRight: Radius.circular(10),
+                                          topLeft: Radius.circular(10))),
+                                  defaultVerticalAlignment:
+                                  TableCellVerticalAlignment.middle,
+                                  columnWidths: {
+                                    0: FractionColumnWidth(0.5),
+                                    1: FractionColumnWidth(0.5),
+                                  },
+                                  children: [
+                                    TableRow(
+                                      decoration: BoxDecoration(
+                                          color: Colors.grey
+                                              .withOpacity(0.3)),
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Text(
+                                            'Module',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              color: Colors.orange,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Text(
+                                            'Uno',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              color: Colors.orange,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            );
+                          } else {
+                            String subTechnicalParameters = widget
+                                .pinConnection
+                                .split(";")[index - 1];
+                            return Table(
+                              border: TableBorder.all(
+                                  width: 0.5,
+                                  color: Colors.white54,
+                                  borderRadius: index ==
+                                      widget.pinConnection
+                                          .split(";")
+                                          .length
+                                      ? BorderRadius.only(
+                                      bottomLeft: Radius.circular(10),
+                                      bottomRight:
+                                      Radius.circular(10))
+                                      : BorderRadius.circular(0)),
+                              defaultVerticalAlignment:
+                              TableCellVerticalAlignment.middle,
+                              columnWidths: {
+                                0: FractionColumnWidth(0.5),
+                                1: FractionColumnWidth(0.5),
+                              },
+                              children: [
+                                TableRow(
+                                  children: [
+                                    TableCell(
+                                      child: Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Text(
+                                          subTechnicalParameters
+                                              .split(":")
+                                              .first,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                    TableCell(
+                                      child: Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Text(
+                                            subTechnicalParameters
+                                                .split(":")
+                                                .last,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                                color: Colors.white)),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            );
+                          }
+                        },
+                      )),
+                ],
+              ),
+            ),
+            Description(id: '', data: [],),
+            SizedBox(
+              height: 50,
+            )
+          ],
+        ));
+  }
+}
+
+class sensorsConvertor {
+  String id;
+  final String name,
+      photoUrl;
+
+
+  sensorsConvertor(
+      {this.id = "",
+        required this.name,
+        required this.photoUrl,});
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "name": name,
+    "photoUrl": photoUrl,
+
+  };
+
+  static sensorsConvertor fromJson(Map<String, dynamic> json) =>
+      sensorsConvertor(
+        id: json['id'],
+        name: json["name"],
+        photoUrl: json["photoUrl"],
+      );
+}
+Stream<List<sensorsConvertor>> readsensors() => FirebaseFirestore.instance
+    .collection('sensors')
+    .orderBy("name", descending: false)
+    .snapshots()
+    .map((snapshot) => snapshot.docs
+    .map((doc) => sensorsConvertor.fromJson(doc.data()))
+    .toList());

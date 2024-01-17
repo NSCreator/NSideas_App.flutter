@@ -1,12 +1,10 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:nsideas/authPage.dart';
 import 'package:nsideas/projects.dart';
 
 import 'functions.dart';
+import 'homePage.dart';
 
 class projectsBasedOnType extends StatefulWidget {
   List<ProjectConvertor> projects;
@@ -85,66 +83,7 @@ class _projectsBasedOnTypeState extends State<projectsBasedOnType> {
                                 builder: (context) =>
                                     Project(data: data)));
                       },
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 15),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            AspectRatio(
-                              aspectRatio: 16 / 8,
-                              child: Container(
-                                  margin: EdgeInsets.symmetric(
-                                      horizontal: 15),
-                                  decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                          image: NetworkImage(
-                                              data.Images.main),
-                                          fit: BoxFit.cover),
-                                      borderRadius:
-                                      BorderRadius.circular(25),
-                                      color: Colors.black12),
-                                  child: Align(
-                                    alignment: Alignment.bottomRight,
-                                    child: Container(
-                                        decoration: BoxDecoration(
-                                            border: Border.all(
-                                                color: Colors.white24),
-                                            color: Colors.black54,
-                                            borderRadius:
-                                            BorderRadius.only(
-                                                bottomRight:
-                                                Radius.circular(
-                                                    30),
-                                                topLeft:
-                                                Radius.circular(
-                                                    15))),
-                                        padding: EdgeInsets.symmetric(
-                                            vertical: 3, horizontal: 10),
-                                        child: Text(
-                                          data.type,
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 22,
-                                              fontWeight:
-                                              FontWeight.w600),
-                                        )),
-                                  )),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20),
-                              child: Text(
-                                "${data.heading.full}",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w500),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      child: projectShowingContainer(data: data,),
                     );
 
                   },

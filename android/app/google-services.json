@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "503839723767",
+    "project_id": "ns-ideas-app",
+    "storage_bucket": "ns-ideas-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:503839723767:android:f869ec1115bcf60f8a43f2",
+        "android_client_info": {
+          "package_name": "com.nimmalasujith.nsideas"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "503839723767-d8ojrc6f43jefa22inevjomkjv7d6d84.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEZH-6FhsKTWjPb59jkCAPfrbKBerUfTk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "503839723767-d8ojrc6f43jefa22inevjomkjv7d6d84.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

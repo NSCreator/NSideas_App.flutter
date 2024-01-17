@@ -44,40 +44,40 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBYxgAkrusk6Ogu7QdL9w10gSw9iZAt0YM',
-    appId: '1:512397462005:web:5e6b83b29c7f113baf78bc',
-    messagingSenderId: '512397462005',
-    projectId: 'prokoni',
-    authDomain: 'prokoni.firebaseapp.com',
-    storageBucket: 'prokoni.appspot.com',
-    measurementId: 'G-EGKM49886V',
+    apiKey: 'AIzaSyBscgTWKBCQF8Udh5wFyDDqHcB-PQ2873M',
+    appId: '1:503839723767:web:708821849baccb2e8a43f2',
+    messagingSenderId: '503839723767',
+    projectId: 'ns-ideas-app',
+    authDomain: 'ns-ideas-app.firebaseapp.com',
+    storageBucket: 'ns-ideas-app.appspot.com',
+    measurementId: 'G-7XVPR9RFXH',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBVb-_KOjpg7bc9CTsizb9eSJgIUrG3imY',
-    appId: '1:512397462005:android:54ebcd089ab07ceaaf78bc',
-    messagingSenderId: '512397462005',
-    projectId: 'prokoni',
-    storageBucket: 'prokoni.appspot.com',
+    apiKey: 'AIzaSyDEZH-6FhsKTWjPb59jkCAPfrbKBerUfTk',
+    appId: '1:503839723767:android:f869ec1115bcf60f8a43f2',
+    messagingSenderId: '503839723767',
+    projectId: 'ns-ideas-app',
+    storageBucket: 'ns-ideas-app.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDsTSsLsw2kxVdQrmpV08-uBN7btkCF_tg',
-    appId: '1:512397462005:ios:5546854a07150889af78bc',
-    messagingSenderId: '512397462005',
-    projectId: 'prokoni',
-    storageBucket: 'prokoni.appspot.com',
-    iosClientId: '512397462005-tklrcadqpnkogde79hejmaknq9p3rt8l.apps.googleusercontent.com',
-    iosBundleId: 'com.example.nsideas',
+    apiKey: 'AIzaSyB2XYfehfYdfd8hio7Qpq3XGPkYQls_n5g',
+    appId: '1:503839723767:ios:9b0b652edc81895e8a43f2',
+    messagingSenderId: '503839723767',
+    projectId: 'ns-ideas-app',
+    storageBucket: 'ns-ideas-app.appspot.com',
+    iosClientId: '503839723767-8oc7kt8unv98t5g3drsi881mvue6gp68.apps.googleusercontent.com',
+    iosBundleId: 'com.nimmalasujith.nsideas',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyDsTSsLsw2kxVdQrmpV08-uBN7btkCF_tg',
-    appId: '1:512397462005:ios:61224eed5d4e8deaaf78bc',
-    messagingSenderId: '512397462005',
-    projectId: 'prokoni',
-    storageBucket: 'prokoni.appspot.com',
-    iosClientId: '512397462005-rd4uomj2qkc5ufcup5alj9f9rpggr070.apps.googleusercontent.com',
-    iosBundleId: 'com.example.nsideas.RunnerTests',
+    apiKey: 'AIzaSyB2XYfehfYdfd8hio7Qpq3XGPkYQls_n5g',
+    appId: '1:503839723767:ios:03abe54ace5d49df8a43f2',
+    messagingSenderId: '503839723767',
+    projectId: 'ns-ideas-app',
+    storageBucket: 'ns-ideas-app.appspot.com',
+    iosClientId: '503839723767-9mahj5kb7dekan6o37ikc9ihn6hufjp7.apps.googleusercontent.com',
+    iosBundleId: 'com.nimmalasujith.nsideas.RunnerTests',
   );
 }

@@ -3,11 +3,7 @@
 import 'dart:io';
 
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:nsideas/projects.dart';
 import 'package:nsideas/settings.dart';
 import 'package:nsideas/textFeild.dart';
@@ -16,9 +12,7 @@ import 'package:http/http.dart' as http;
 import 'package:photo_view/photo_view.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-import 'authPage.dart';
 import 'homePage.dart';
-
 
 const TextStyle creatorHeadingTextStyle =
     TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: Colors.black);
@@ -67,7 +61,8 @@ class _backGroundImageState extends State<backGroundImage> {
                         Expanded(
                           child: Text(
                             " ${widget.text}",
-                            style: TextStyle(color: Colors.black87, fontSize: 16),
+                            style:
+                                TextStyle(color: Colors.black87, fontSize: 16),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -111,7 +106,6 @@ class _TextFieldContainerState extends State<TextFieldContainer> {
                   color: Colors.black),
             ),
           ),
-
         Padding(
           padding:
               const EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
@@ -136,7 +130,7 @@ TextStyle textFieldStyle(double size) {
   return TextStyle(
     color: Colors.black,
     fontWeight: FontWeight.w500,
-    fontSize: size * 20,
+    fontSize: 20,
   );
 }
 
@@ -144,7 +138,7 @@ TextStyle textFieldHintStyle(double size) {
   return TextStyle(
     color: Colors.black54,
     fontWeight: FontWeight.w300,
-    fontSize: size * 18,
+    fontSize: 18,
   );
 }
 
@@ -205,16 +199,19 @@ class _ImageShowAndDownloadState extends State<ImageShowAndDownload> {
         ? InkWell(
             child: !File(filePath).existsSync()
                 ? SizedBox(
-              width: double.infinity,
-              child: Image.network(widget.image,fit: BoxFit.cover,),
-            )
+                    width: double.infinity,
+                    child: Image.network(
+                      widget.image,
+                      fit: BoxFit.cover,
+                    ),
+                  )
                 : SizedBox(
-              width: double.infinity,
-                  child: Image.file(
+                    width: double.infinity,
+                    child: Image.file(
                       File(filePath),
                       fit: BoxFit.cover,
                     ),
-                ),
+                  ),
             onTap: () {
               if (widget.isZoom)
                 Navigator.push(
@@ -247,16 +244,19 @@ class _ImageShowAndDownloadState extends State<ImageShowAndDownload> {
           )
         : !File(filePath).existsSync()
             ? SizedBox(
-      width: double.infinity,
-                child: Image.network(widget.image,fit: BoxFit.cover,),
+                width: double.infinity,
+                child: Image.network(
+                  widget.image,
+                  fit: BoxFit.cover,
+                ),
               )
             : SizedBox(
-      width: double.infinity,
-              child: Image.file(
+                width: double.infinity,
+                child: Image.file(
                   File(filePath),
                   fit: BoxFit.cover,
                 ),
-            );
+              );
   }
 }
 
@@ -287,14 +287,14 @@ class _backButtonState extends State<backButton> {
               child: Icon(
                 Icons.arrow_back,
                 size: 20,
-                color: Colors.white,
+                color: Colors.black,
               ),
             ),
             if (widget.text.isNotEmpty)
               Expanded(
                 child: Text(
                   widget.text,
-                  style: TextStyle(fontSize: 16, color: Colors.white),
+                  style: TextStyle(fontSize: 16, color: Colors.black),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
@@ -325,7 +325,6 @@ class _scrollingImagesState extends State<scrollingImages> {
 
   @override
   Widget build(BuildContext context) {
-    double Size = size(context);
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -347,7 +346,7 @@ class _scrollingImagesState extends State<scrollingImages> {
             itemBuilder:
                 (BuildContext context, int itemIndex, int pageViewIndex) {
               return ClipRRect(
-                  borderRadius: BorderRadius.circular(Size * 10),
+                  borderRadius: BorderRadius.circular(10),
                   child: ImageShowAndDownload(
                     image: widget.images[itemIndex],
                     id: widget.id,
@@ -390,14 +389,13 @@ class tableOfContent extends StatefulWidget {
 class _tableOfContentState extends State<tableOfContent> {
   @override
   Widget build(BuildContext context) {
-    double Size = size(context);
     return Container(
-      margin: EdgeInsets.all(Size * 10.0),
-      padding: EdgeInsets.all(Size * 10.0),
+      margin: EdgeInsets.all(10.0),
+      padding: EdgeInsets.all(10.0),
       alignment: Alignment.center,
       decoration: BoxDecoration(
           color: Colors.black.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(Size * 20),
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(color: Colors.white10)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -406,12 +404,10 @@ class _tableOfContentState extends State<tableOfContent> {
           Text(
             "Table of Content : ",
             style: TextStyle(
-                fontSize: Size * 20,
-                color: Colors.black,
-                fontWeight: FontWeight.w500),
+                fontSize: 20, color: Colors.black, fontWeight: FontWeight.w500),
           ),
           Padding(
-            padding: EdgeInsets.only(left: Size * 20, right: Size * 10),
+            padding: EdgeInsets.only(left: 20, right: 10),
             child: ListView.builder(
               physics: const NeverScrollableScrollPhysics(),
               itemCount: widget.list.length,
@@ -424,18 +420,18 @@ class _tableOfContentState extends State<tableOfContent> {
                       children: [
                         Icon(
                           Icons.circle,
-                          size: Size * 5,
+                          size: 5,
                           color: Colors.black87,
                         ),
                       ],
                     ),
                     SizedBox(
-                      width: Size * 10,
+                      width: 10,
                     ),
                     Text(
                       name,
                       style: TextStyle(
-                        fontSize: Size * 16,
+                        fontSize: 16,
                         color: Colors.black,
                       ),
                       maxLines: 1,
@@ -456,7 +452,7 @@ class Requires extends StatefulWidget {
   List<convertorForTRCSRC> data;
   String title;
 
-  Requires({required this.data,required this.title});
+  Requires({required this.data, required this.title});
 
   @override
   State<Requires> createState() => _RequiresState();
@@ -465,14 +461,13 @@ class Requires extends StatefulWidget {
 class _RequiresState extends State<Requires> {
   @override
   Widget build(BuildContext context) {
-    double Size = size(context);
     return Container(
-      margin: EdgeInsets.all(Size * 10.0),
-      padding: EdgeInsets.all(Size * 10.0),
+      margin: EdgeInsets.all(10.0),
+      padding: EdgeInsets.all(10.0),
       alignment: Alignment.center,
       decoration: BoxDecoration(
           color: Colors.black.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(Size * 20),
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(color: Colors.white10)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -483,15 +478,14 @@ class _RequiresState extends State<Requires> {
               Text(
                 widget.title,
                 style: TextStyle(
-                    fontSize: Size * 20,
+                    fontSize: 20,
                     color: Colors.black,
                     fontWeight: FontWeight.w500),
               ),
             ],
           ),
           ListView.builder(
-            padding: EdgeInsets.only(
-                left: Size * 20, right: Size * 10),
+            padding: EdgeInsets.only(left: 20, right: 10),
             physics: NeverScrollableScrollPhysics(),
             itemCount: widget.data.length,
             shrinkWrap: true,
@@ -503,20 +497,20 @@ class _RequiresState extends State<Requires> {
                     children: [
                       Icon(
                         Icons.circle,
-                        size: Size * 5,
+                        size: 5,
                         color: Colors.black,
                       ),
                     ],
                   ),
                   SizedBox(
-                    width: Size * 5,
+                    width: 5,
                   ),
                   Expanded(
                     child: InkWell(
                       child: Text(
                         data.heading,
                         style: TextStyle(
-                          fontSize: Size * 18,
+                          fontSize: 18,
                           color: Colors.black87,
                         ),
                         maxLines: 1,
@@ -526,8 +520,7 @@ class _RequiresState extends State<Requires> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => zoom(
-                                    url: data.image)));
+                                builder: (context) => zoom(url: data.image)));
                       },
                     ),
                   ),
@@ -549,9 +542,6 @@ class _RequiresState extends State<Requires> {
     );
   }
 }
-
-
-
 
 class youtube extends StatefulWidget {
   final url;
@@ -597,25 +587,21 @@ class _youtubeState extends State<youtube> {
 class zoom extends StatefulWidget {
   String url;
 
-
-  zoom({Key? key, required this.url})
-      : super(key: key);
+  zoom({Key? key, required this.url}) : super(key: key);
 
   @override
   State<zoom> createState() => _zoomState();
 }
 
 class _zoomState extends State<zoom> {
-
-
   @override
   Widget build(BuildContext context) {
     return backGroundImage(
       text: "back",
       child: Center(
         child: PhotoView(
-                imageProvider: NetworkImage(widget.url),
-              ),
+          imageProvider: NetworkImage(widget.url),
+        ),
       ),
     );
   }
@@ -634,7 +620,6 @@ class Description extends StatefulWidget {
 class _DescriptionState extends State<Description> {
   @override
   Widget build(BuildContext context) {
-    double Size = size(context);
     return Container(
       margin: EdgeInsets.all(4),
       padding: EdgeInsets.all(4),
@@ -646,7 +631,7 @@ class _DescriptionState extends State<Description> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: Size * 8, vertical: 10),
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -655,19 +640,20 @@ class _DescriptionState extends State<Description> {
                   style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.w500,
-                      fontSize: Size * 20),
+                      fontSize: 20),
                 ),
-                if(isUser())ElevatedButton(
-                  child: Text("ADD"),
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => DescriptionCreator(
-                                  id: widget.id,
-                                )));
-                  },
-                ),
+                if (isUser())
+                  ElevatedButton(
+                    child: Text("ADD"),
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => DescriptionCreator(
+                                    id: widget.id,
+                                  )));
+                    },
+                  ),
               ],
             ),
           ),
@@ -681,84 +667,75 @@ class _DescriptionState extends State<Description> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (SubjectsData.subData.isNotEmpty)
-                        StyledTextWidget(
-                          text: SubjectsData.data,
-                          fontSize: Size * 18,
-                          color: Colors.black,
-                        )
-                      else if (SubjectsData.images.isNotEmpty)
-                        StyledTextWidget(
-                          text: SubjectsData.data,
-                          fontSize: Size * 18,
-                          color: Colors.black87,
-                        )
-                      else
-                        StyledTextWidget(
-                            text: "       ${SubjectsData.data}",
-                            fontSize: Size * 18,
-                            color: Colors.black.withOpacity(0.9)),
-                      if (SubjectsData.images.isNotEmpty)
-                        Padding(
-                          padding: EdgeInsets.only(top: Size * 20),
-                          child: scrollingImages(
-                            images: SubjectsData.images,
-                            id: widget.id,
-                            isZoom: true,
-                          ),
-                        ),
-                      if (SubjectsData.subData.isNotEmpty)
-                        ListView.builder(
-                            physics: const NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            itemCount: SubjectsData.subData.length,
-                            itemBuilder: (BuildContext context, int index) {
-
-                              if (SubjectsData.subData.isNotEmpty) {
-                                return Padding(
-                                  padding: EdgeInsets.all(Size * 8.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "${index + 1}. ",
-                                        style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: Size * 14),
-                                      ),
-                                      Expanded(
-                                          child: StyledTextWidget(
-                                              text: SubjectsData.subData[index],
-                                              color:
-                                                  Colors.black.withOpacity(0.8),
-                                              fontSize: Size * 16)),
-                                    ],
+                  if (SubjectsData.points.isNotEmpty)
+                    StyledTextWidget(
+                      text: SubjectsData.heading,
+                      fontSize: 18,
+                      color: Colors.black,
+                    )
+                  else if (SubjectsData.images.isNotEmpty)
+                    StyledTextWidget(
+                      text: SubjectsData.heading,
+                      fontSize: 18,
+                      color: Colors.black87,
+                    )
+                  else
+                    StyledTextWidget(
+                        text: "       ${SubjectsData.heading}",
+                        fontSize: 18,
+                        color: Colors.black.withOpacity(0.9)),
+                  if (SubjectsData.images.isNotEmpty)
+                    Padding(
+                      padding: EdgeInsets.only(top: 20),
+                      child: scrollingImages(
+                        images: SubjectsData.images,
+                        id: widget.id,
+                        isZoom: true,
+                      ),
+                    ),
+                  if (SubjectsData.points.isNotEmpty)
+                    ListView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: SubjectsData.points.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          if (SubjectsData.points.isNotEmpty) {
+                            return Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "${index + 1}. ",
+                                    style: TextStyle(
+                                        color: Colors.black, fontSize: 14),
                                   ),
-                                );
-                              } else {
-                                return Padding(
-                                    padding: EdgeInsets.all(Size * 5.0),
-                                    child: StyledTextWidget(
-                                        text: SubjectsData.subData[index],
-                                        color: Colors.amberAccent,
-                                        fontSize: Size * 20));
-                              }
-                            }),
-                    ],
-                  ),
+                                  Expanded(
+                                      child: StyledTextWidget(
+                                          text: SubjectsData.points[index],
+                                          color: Colors.black.withOpacity(0.8),
+                                          fontSize: 16)),
+                                ],
+                              ),
+                            );
+                          } else {
+                            return Padding(
+                                padding: EdgeInsets.all(5.0),
+                                child: StyledTextWidget(
+                                    text: SubjectsData.points[index],
+                                    color: Colors.amberAccent,
+                                    fontSize: 20));
+                          }
+                        }),
                   if (SubjectsData.table.isNotEmpty)
                     Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: Size * 8, vertical: Size * 10),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 8, vertical: 10),
                       child: Container(
                         decoration: BoxDecoration(
-                            color: Colors.black,borderRadius: BorderRadius.circular(15)),
+                            color: Colors.black,
+                            borderRadius: BorderRadius.circular(15)),
                         child: ListView.builder(
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
@@ -768,17 +745,18 @@ class _DescriptionState extends State<Description> {
                             TableConvertor subTechnicalParameters =
                                 SubjectsData.table[index];
                             return Table(
-
                               border: TableBorder.all(
-                                  width: Size * 0.5,
+                                  width: 0.5,
                                   color: Colors.white60,
-                                  borderRadius: index ==0? BorderRadius.only(
-                                      topLeft: Radius.circular(Size * 15),
-                                      topRight: Radius.circular(Size * 15)): index ==
-                                      SubjectsData.table.length - 1
+                                  borderRadius: index == 0
                                       ? BorderRadius.only(
-                                      bottomLeft: Radius.circular(Size * 15),
-                                      bottomRight: Radius.circular(Size * 15)):BorderRadius.circular(0)),
+                                          topLeft: Radius.circular(15),
+                                          topRight: Radius.circular(15))
+                                      : index == SubjectsData.table.length - 1
+                                          ? BorderRadius.only(
+                                              bottomLeft: Radius.circular(15),
+                                              bottomRight: Radius.circular(15))
+                                          : BorderRadius.circular(0)),
                               defaultVerticalAlignment:
                                   TableCellVerticalAlignment.middle,
                               columnWidths: const {
@@ -787,24 +765,25 @@ class _DescriptionState extends State<Description> {
                               },
                               children: [
                                 TableRow(
-                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8)),
                                   children: [
                                     TableCell(
                                       child: Padding(
-                                        padding: EdgeInsets.all(Size * 8.0),
+                                        padding: EdgeInsets.all(8.0),
                                         child: Text(
                                           textAlign: TextAlign.center,
-                                          subTechnicalParameters.name,
+                                          subTechnicalParameters.col0,
                                           style: TextStyle(color: Colors.white),
                                         ),
                                       ),
                                     ),
                                     TableCell(
                                       child: Padding(
-                                        padding: EdgeInsets.all(Size * 8.0),
+                                        padding: EdgeInsets.all(8.0),
                                         child: Text(
                                             textAlign: TextAlign.center,
-                                            subTechnicalParameters.description,
+                                            subTechnicalParameters.col1,
                                             style:
                                                 TextStyle(color: Colors.white)),
                                       ),
@@ -818,143 +797,131 @@ class _DescriptionState extends State<Description> {
                       ),
                     ),
                   if (SubjectsData.files.isNotEmpty)
-                    ConstrainedBox(
-                      constraints: BoxConstraints(maxHeight: 200),
-                      child: Container(
-                        margin: EdgeInsets.all(Size * 5.0),
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: Colors.black,
-                          // border: Border.all(color: Colors.white24),
-                          borderRadius: BorderRadius.circular(Size * 10),
-                        ),
-                        child: Column(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white24,
-                                borderRadius: BorderRadius.only(
-                                  topRight: Radius.circular(Size * 10),
-                                  topLeft: Radius.circular(Size * 10),
+                    ListView.builder(
+                        itemCount: SubjectsData.files.length,
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemBuilder: (context, int index) {
+                          final data = SubjectsData.files[index];
+                          return InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) {return MaterialApp(
+                                        debugShowCheckedModeBanner: false,
+                                            home: Scaffold(
+                                              backgroundColor: Colors.black,
+                                              body: SafeArea(
+                                                child: Hero(
+                                                  tag: "textTag$index",
+                                                  child: SingleChildScrollView(
+
+                                                    scrollDirection:
+                                                        Axis.horizontal,
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets
+                                                              .all(8.0),
+                                                      child: SelectableText(
+                                                        data.data,
+                                                        style: TextStyle(
+                                                            fontSize: 16,
+                                                            color: Colors
+                                                                .white),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          );}));
+                            },
+                            child: Hero(
+                              tag: "textTag$index",
+                              child: Container(
+                                // constraints: BoxConstraints(maxHeight: 200),
+                                margin: EdgeInsets.all(5.0),
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: Colors.black,
+                                  // border: Border.all(color: Colors.white24),
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                              ),
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                    vertical: Size * 2.0,
-                                    horizontal: Size * 6.0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      "Code",
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 14),
-                                    ),
-                                    Spacer(),
-                                    InkWell(
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                            vertical: 1.8, horizontal: 8),
-                                        margin: EdgeInsets.only(right: 10),
-                                        decoration: BoxDecoration(
-                                          color: Colors.black,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                        child: Text(
-                                          "full code",
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 14),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white24,
+                                        borderRadius: BorderRadius.only(
+                                          topRight: Radius.circular(10),
+                                          topLeft: Radius.circular(10),
                                         ),
                                       ),
-                                      onTap: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    Scaffold(
-                                                      backgroundColor: Colors.black,
-                                                      body: SafeArea(
-                                                        child: Column(
-                                                          children: [
-                                                            Padding(
-                                                              padding: const EdgeInsets.all(8.0),
-                                                              child: InkWell(
-                                                                onTap: () {
-                                                                  Navigator.pop(context);
-                                                                },
-                                                                child: Row(
-                                                                  children: [
-                                                                    Icon(
-                                                                      Icons.arrow_back,
-                                                                      size: 25,
-                                                                      color: Colors.white,
-                                                                    ),
-                                                                    Text(
-                                                                      "back",
-                                                                      style: TextStyle(color: Colors.white70, fontSize: 16),
-                                                                      maxLines: 1,
-                                                                      overflow: TextOverflow.ellipsis,
-                                                                    )
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Expanded(
-                                                              child: SingleChildScrollView(
-                                                                scrollDirection: Axis.horizontal,
-                                                                child: Padding(
-                                                                  padding: const EdgeInsets.all(8.0),
-                                                                  child: SelectableText(
-                                                                    SubjectsData.files.first,
-                                                                    style: TextStyle(fontSize: Size * 16, color: Colors.white),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    )
-
-                                            ));
-                                      },
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 2.0, horizontal: 6.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              "Code (${data.heading})",
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 15),
+                                            ),
+                                            Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 2.0,
+                                                  horizontal: 6.0),
+                                              margin: EdgeInsets.symmetric(
+                                                  vertical: 2.0,
+                                                  horizontal: 6.0),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white60,
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                              child: Text(
+                                                "Full Code",
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 14),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
-
+                                    Padding(
+                                      padding: const EdgeInsets.all(5.0),
+                                      child: SelectableText(
+                                        scrollPhysics:
+                                            NeverScrollableScrollPhysics(),
+                                        data.data,
+                                        maxLines: 5,
+                                        minLines: 1,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.white.withOpacity(0.9),
+                                        ),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
                             ),
-                            Expanded(
-                              child: SingleChildScrollView(
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: SelectableText(
-                                      SubjectsData.files.first,
-                                      style: TextStyle(
-                                          fontSize: Size * 16,
-                                          color: Colors.white
-                                              .withOpacity(0.9)),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
+                          );
+                        })
                 ],
               );
             },
             separatorBuilder: (context, index) => SizedBox(
-              height: Size * 15,
+              height: 15,
             ),
           ),
         ],
@@ -975,14 +942,13 @@ class youtubeInfo extends StatefulWidget {
 class _youtubeInfoState extends State<youtubeInfo> {
   @override
   Widget build(BuildContext context) {
-    double Size = size(context);
     return Container(
       padding: const EdgeInsets.all(10),
       margin: const EdgeInsets.all(10),
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(Size * 25),
+        borderRadius: BorderRadius.circular(25),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -993,7 +959,7 @@ class _youtubeInfoState extends State<youtubeInfo> {
               Text(
                 "Making Video",
                 style: TextStyle(
-                    fontSize: Size * 20,
+                    fontSize: 20,
                     color: Colors.black,
                     fontWeight: FontWeight.w500),
               ),
@@ -1008,14 +974,13 @@ class _youtubeInfoState extends State<youtubeInfo> {
                   child: Container(
                     decoration: BoxDecoration(
                         color: Colors.black,
-                        borderRadius: BorderRadius.circular(Size * 20)),
+                        borderRadius: BorderRadius.circular(20)),
                     child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          vertical: Size * 5.0, horizontal: 15),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 5.0, horizontal: 15),
                       child: Text(
                         "Play",
-                        style:
-                            TextStyle(color: Colors.white, fontSize: Size * 20),
+                        style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
                     ),
                   ),
@@ -1033,21 +998,20 @@ class _youtubeInfoState extends State<youtubeInfo> {
                 ),
                 InkWell(
                   child: Container(
-                    padding: EdgeInsets.symmetric(
-                        vertical: Size * 2.0, horizontal: 10),
+                    padding:
+                        EdgeInsets.symmetric(vertical: 2.0, horizontal: 10),
                     decoration: BoxDecoration(
                         color: Colors.black,
-                        borderRadius: BorderRadius.circular(Size * 25)),
+                        borderRadius: BorderRadius.circular(25)),
                     child: Row(
                       children: [
                         Text(
                           " View On ",
-                          style: TextStyle(
-                              color: Colors.white, fontSize: Size * 20),
+                          style: TextStyle(color: Colors.white, fontSize: 20),
                         ),
                         Container(
-                            height: Size * 40,
-                            width: Size * 100,
+                            height: 40,
+                            width: 100,
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8),
                                 image: const DecorationImage(
@@ -1070,20 +1034,19 @@ class _youtubeInfoState extends State<youtubeInfo> {
   }
 }
 
-
-
 class StyledTextWidget extends StatelessWidget {
   final String text;
   final double fontSize;
   final Color color;
   final FontWeight fontWeight;
 
-  const StyledTextWidget(
-      {super.key,
-      required this.text,
-      this.fontSize = 16,
-      this.color = Colors.black,
-      this.fontWeight = FontWeight.normal});
+  const StyledTextWidget({
+    super.key,
+    required this.text,
+    this.fontSize = 16,
+    this.color = Colors.black,
+    this.fontWeight = FontWeight.normal,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1091,16 +1054,20 @@ class StyledTextWidget extends StatelessWidget {
 
     List<String> words = text.split(' ');
 
-    for (String word in words) {
+    for (int i = 0; i < words.length; i++) {
+      String word = words[i];
+      bool isLastWord = i == words.length - 1;
+
       if (word.startsWith('**')) {
         spans.add(TextSpan(
           children: [
             WidgetSpan(
               child: Container(
                 decoration: BoxDecoration(
-                    color: Colors.white12,
-                    borderRadius: BorderRadius.circular(5.0),
-                    border: Border.all(color: Colors.white54)),
+                  color: Colors.white12,
+                  borderRadius: BorderRadius.circular(5.0),
+                  border: Border.all(color: Colors.white54),
+                ),
                 padding: EdgeInsets.symmetric(horizontal: 4.0, vertical: 2),
                 child: Text(
                   word.substring(2),
@@ -1108,7 +1075,8 @@ class StyledTextWidget extends StatelessWidget {
                 ),
               ),
             ),
-            TextSpan(text: ' '),
+            if (!isLastWord) TextSpan(text: ' '),
+            // Add space only if not the last word
           ],
         ));
       } else if (word.startsWith("'") && word.endsWith("'")) {
@@ -1119,19 +1087,18 @@ class StyledTextWidget extends StatelessWidget {
           ),
         ));
       } else {
-        spans.add(TextSpan(text: '$word '));
+        spans.add(TextSpan(text: '$word'));
+        if (!isLastWord)
+          spans.add(TextSpan(text: ' ')); // Add space only if not the last word
       }
     }
 
-    return Wrap(
-      children: [
-        RichText(
-          text: TextSpan(
-              children: spans,
-              style: TextStyle(
-                  fontSize: fontSize, color: color, fontWeight: fontWeight)),
-        ),
-      ],
+    return RichText(
+      text: TextSpan(
+        children: spans,
+        style:
+            TextStyle(fontSize: fontSize, color: color, fontWeight: fontWeight),
+      ),
     );
   }
 }

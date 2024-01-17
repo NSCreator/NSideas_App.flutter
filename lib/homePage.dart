@@ -3,35 +3,31 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:carousel_slider/carousel_options.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
 import 'package:nsideas/projects.dart';
 import 'package:nsideas/searchBar.dart';
 import 'package:nsideas/settings.dart';
 import 'package:nsideas/subPage.dart';
+import 'package:nsideas/test.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'authPage.dart';
-import 'main.dart';
+import 'functions.dart';
+
 class AdVideo {
   static String get bannerAdUnitId {
     if (Platform.isAndroid) {
       return 'ca-app-pub-7097300908994281/9491925792';
-    }else {
+    } else {
       return 'ca-app-pub-7097300908994281/8849115979';
     }
   }
 }
+
 class HomePage extends StatefulWidget {
-  // final List<ProjectsConvertor> data;
 
   const HomePage({super.key});
 
@@ -48,126 +44,91 @@ class _HomePageState extends State<HomePage> {
     "Sensors",
   ];
 
-  late final RewardedAd rewardedAd;
-  bool isAdLoaded = false;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  double remainingTime = 0;
-
-  void _loadRewardedAd() {
-    RewardedAd.load(
-      adUnitId: AdVideo.bannerAdUnitId,
-      request: const AdRequest(),
-      rewardedAdLoadCallback: RewardedAdLoadCallback(
-        onAdFailedToLoad: (LoadAdError error) {
-          print("Failed to load rewarded ad, Error: $error");
-        },
-        onAdLoaded: (RewardedAd ad) async {
-          print("$ad loaded");
-          showToastText("Add loaded");
-          rewardedAd = ad;
-          _setFullScreenContentCallback();
-          await _showRewardedAd();
-          final user = _auth.currentUser;
-          if (user != null) {
-            final imageRef = _firestore
-                .collection('users')
-                .doc(fullUserId());
-            await imageRef.update({
-              'lastOpenAdTime':
-              FieldValue.serverTimestamp(),
-            });
-          }
-
-
-
-
-        },
-      ),
-    );
-  }
-
-  //method to set show content call back
-  void _setFullScreenContentCallback() {
-    if (rewardedAd == null) {
-      return;
-    }
-    rewardedAd.fullScreenContentCallback = FullScreenContentCallback(
-      //when ad  shows fullscreen
-      onAdShowedFullScreenContent: (RewardedAd ad) =>
-          print("$ad onAdShowedFullScreenContent"),
-      //when ad dismissed by user
-      onAdDismissedFullScreenContent: (RewardedAd ad) {
-        print("$ad onAdDismissedFullScreenContent");
-
-        //dispose the dismissed ad
-        ad.dispose();
-      },
-      //when ad fails to show
-      onAdFailedToShowFullScreenContent: (RewardedAd ad, AdError error) {
-        print("$ad  onAdFailedToShowFullScreenContent: $error ");
-        //dispose the failed ad
-        ad.dispose();
-      },
-
-      //when impression is detected
-      onAdImpression: (RewardedAd ad) => print("$ad Impression occured"),
-    );
-  }
-
-  Future<void> _showRewardedAd() async {
-    rewardedAd.show(
-        onUserEarnedReward: (AdWithoutView ad, RewardItem rewardItem) {
-          num amount = rewardItem.amount;
-          showToastText("You earned: $amount");
-
-        });
-    final imageRef = _firestore.collection("user").doc(fullUserId());
-
-    final documentSnapshot = await imageRef.get();
-    if (documentSnapshot.exists) {
-      final data = documentSnapshot.data() as Map<String, dynamic>;
-      if (data['adSeenCount']==null) {
-        _firestore.collection("user").doc(fullUserId()).update({"adSeenCount":0});
-      } else {
-        _firestore.collection("user").doc(fullUserId()).update({"adSeenCount":data['adSeenCount']+1});
-
-      }
-    }
-  }
-
-
-  Future<void> _checkImageOpenStatus() async {
-    final user = _auth.currentUser;
-    if (user != null) {
-      final imageRef = _firestore.collection("users").doc(fullUserId());
-      final documentSnapshot = await imageRef.get();
-      if (documentSnapshot.exists) {
-        final data = documentSnapshot.data() as Map<String, dynamic>;
-        if (data['lastOpenAdTime']==null) {
-          _loadRewardedAd();
-        } else {
-          final lastOpenTime = data['lastOpenAdTime'] as Timestamp;
-          final currentTime = Timestamp.now();
-          final difference = currentTime.seconds - lastOpenTime.seconds;
-          if(difference >= 10800){
-            _loadRewardedAd();
-          }else{
-            remainingTime = ((10800 - difference) / 60)/60;
-            showToastText("${remainingTime.toStringAsFixed(1)} Hours for Ad" );
-          }
-        }
-      }
-    }
-  }
+  // late final RewardedAd rewardedAd;
+  // bool isAdLoaded = false;
+  //
+  // void _loadRewardedAd() {
+  //   RewardedAd.load(
+  //     adUnitId: AdVideo.bannerAdUnitId,
+  //     request: const AdRequest(),
+  //     rewardedAdLoadCallback: RewardedAdLoadCallback(
+  //       onAdFailedToLoad: (LoadAdError error) {
+  //         print("Failed to load rewarded ad, Error: $error");
+  //       },
+  //       onAdLoaded: (RewardedAd ad) async {
+  //         print("$ad loaded");
+  //         showToastText("Ad loaded");
+  //         rewardedAd = ad;
+  //         _setFullScreenContentCallback();
+  //         await _showRewardedAd();
+  //         SharedPreferences prefs = await SharedPreferences.getInstance();
+  //         prefs.setInt('lastOpenAdTime', DateTime.now().millisecondsSinceEpoch);
+  //       },
+  //     ),
+  //   );
+  // }
+  // //method to set show content call back
+  // void _setFullScreenContentCallback() {
+  //   rewardedAd.fullScreenContentCallback = FullScreenContentCallback(
+  //     //when ad  shows fullscreen
+  //     onAdShowedFullScreenContent: (RewardedAd ad) =>
+  //         print("$ad onAdShowedFullScreenContent"),
+  //     //when ad dismissed by user
+  //     onAdDismissedFullScreenContent: (RewardedAd ad) {
+  //       print("$ad onAdDismissedFullScreenContent");
+  //
+  //       //dispose the dismissed ad
+  //       ad.dispose();
+  //     },
+  //     //when ad fails to show
+  //     onAdFailedToShowFullScreenContent: (RewardedAd ad, AdError error) {
+  //       print("$ad  onAdFailedToShowFullScreenContent: $error ");
+  //       //dispose the failed ad
+  //       ad.dispose();
+  //     },
+  //
+  //     //when impression is detected
+  //     onAdImpression: (RewardedAd ad) => print("$ad Impression occured"),
+  //   );
+  // }
+  //
+  // Future<void> _showRewardedAd() async {
+  //   rewardedAd.show(
+  //       onUserEarnedReward: (AdWithoutView ad, RewardItem rewardItem) {
+  //         num amount = rewardItem.amount;
+  //         showToastText("You earned: $amount");
+  //       });
+  // }
+  //
+  // double remainingTime = 0;
+  //
+  //
+  // Future<void> _checkImageOpenStatus() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //
+  //   int? lastOpenTime = prefs.getInt('lastOpenAdTime');
+  //
+  //   if (lastOpenTime == null) {
+  //     _loadRewardedAd();
+  //   } else {
+  //     final currentTime = DateTime.now().millisecondsSinceEpoch;
+  //     final difference = (currentTime - lastOpenTime) ~/ 1000;
+  //
+  //     if (difference >= 43200) {
+  //       _loadRewardedAd();
+  //     } else {
+  //       remainingTime = ((43200 - difference) / 60)/60;
+  //       showToastText("Ad with in ${remainingTime.toInt()} Hours");
+  //     }
+  //   }
+  // }
   List<ProjectConvertor> projects = [];
 
   @override
   void initState() {
     super.initState();
-    _checkImageOpenStatus();
-    getDat(false);
+    // _checkImageOpenStatus();
+    getDat(true);
   }
 
   Future<dynamic> getDat(bool isReload) async {
@@ -184,7 +145,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blueGrey.shade100,
       body: RefreshIndicator(
         onRefresh: getData,
         child: SafeArea(
@@ -195,7 +155,7 @@ class _HomePageState extends State<HomePage> {
               children: [
                 appBar_HomePage(
                   size: 1,
-                  name: "",
+                  name: "Welcome Back!",
                   projects: projects,
                 ),
                 StreamBuilder<List<HomePageImagesConvertor>>(
@@ -255,18 +215,30 @@ class _HomePageState extends State<HomePage> {
                                 child: Container(
                                   height: 70,
                                   width: 100,
-                                  color: Colors.black12,
+                                  color: Colors.blueGrey.shade100,
                                   child: Image.asset(images[index]),
                                 ),
                               ),
                               Text(
                                 tabBatList[index],
-                                style: TextStyle(fontSize: 14, color: Colors.black87),
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.black87),
                               ),
                             ],
                           ),
                           onTap: () {
-                            if (index == 3 || index == 1) {
+                            if (index == 3 ){
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => sensorsAndComponents(
+
+                                  ),
+                                ),
+                              );
+
+                            }
+                            else if( index == 1) {
                               showToastText("Coming Soon");
                             } else {
                               Navigator.push(
@@ -284,6 +256,147 @@ class _HomePageState extends State<HomePage> {
                       );
                     },
                   ),
+                ),
+                StreamBuilder<List<arduinoBoardsConvertor>>(
+                  stream: readarduinoBoards(),
+                  builder: (context, snapshot) {
+                    final Subjects = snapshot.data;
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.waiting:
+                        return const Center(
+                            child: CircularProgressIndicator(
+                              strokeWidth: 0.3,
+                              color: Colors.cyan,
+                            ));
+                      default:
+                        if (snapshot.hasError) {
+                          return const Text("Error with server");
+                        } else {
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: Text(
+                                   "Boards",
+                                    style: TextStyle(
+                                      fontSize: 25.0,
+                                      color: Colors.black,
+                                      fontWeight:
+                                      FontWeight.w500,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow
+                                        .ellipsis,
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 60,
+                                  child: ListView.separated(
+                                      itemCount: Subjects!.length,
+                                      scrollDirection: Axis.horizontal,
+                                      itemBuilder: (BuildContext context, int index) {
+                                        final SubjectsData = Subjects[index];
+
+                                        return InkWell(
+                                          child: Row(
+                                            children: [
+                                              SizedBox(
+
+                                                width: 80,
+                                                child: ImageShowAndDownload(
+                                                  image: SubjectsData
+                                                      .images.first,
+                                                  id: SubjectsData.id,
+                                                ),
+                                              ),
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                  color: Colors.black
+                                                      .withOpacity(0.1),
+                                                  borderRadius:
+                                                  BorderRadius
+                                                      .circular(25),
+                                                ),
+                                                child: Padding(
+                                                  padding: EdgeInsets
+                                                      .symmetric(
+                                                      horizontal:
+                                                      8.0),
+                                                  child: Text(
+                                                    SubjectsData
+                                                        .heading.full,
+                                                    style: TextStyle(
+                                                      fontSize: 25.0,
+                                                      color: Colors.black,
+                                                      fontWeight:
+                                                      FontWeight.w500,
+                                                    ),
+                                                    maxLines: 1,
+                                                    overflow: TextOverflow
+                                                        .ellipsis,
+                                                  ),
+                                                ),
+                                              ),
+                                              if (Subjects.length - index == 1)
+                                                SizedBox(
+                                                  width: 80,
+                                                )
+                                            ],
+                                          ),
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              PageRouteBuilder(
+                                                transitionDuration:
+                                                const Duration(milliseconds: 300),
+                                                pageBuilder: (context, animation,
+                                                    secondaryAnimation) =>
+                                                    arduinoBoard(
+                                                      data: SubjectsData,
+                                                    ),
+                                                transitionsBuilder: (context,
+                                                    animation,
+                                                    secondaryAnimation,
+                                                    child) {
+                                                  final fadeTransition =
+                                                  FadeTransition(
+                                                    opacity: animation,
+                                                    child: child,
+                                                  );
+
+                                                  return Container(
+                                                    color: Colors.black
+                                                        .withOpacity(animation.value),
+                                                    child: AnimatedOpacity(
+                                                        duration: Duration(
+                                                            milliseconds: 300),
+                                                        opacity: animation.value
+                                                            .clamp(0.3, 1.0),
+                                                        child: fadeTransition),
+                                                  );
+                                                },
+                                              ),
+                                            );
+                                          },
+                                        );
+                                      },
+                                      separatorBuilder: (context, index) => SizedBox(
+                                        height: 10,
+                                        child: Divider(
+                                          color: Colors.blue,
+                                        ),
+                                      )),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                    }
+                  },
                 ),
                 Padding(
                   padding: const EdgeInsets.all(15.0),
@@ -310,68 +423,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                         );
                       },
-                      child: Container(
-                        margin: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.black12,
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            AspectRatio(
-                              aspectRatio: 16 / 8,
-                              child: Container(
-                                margin:
-                                EdgeInsets.symmetric(horizontal: 2, vertical: 2),
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: NetworkImage(data.Images.main),
-                                    fit: BoxFit.cover,
-                                  ),
-                                  borderRadius: BorderRadius.circular(25),
-                                  color: Colors.black12,
-                                ),
-                                child: Align(
-                                  alignment: Alignment.bottomRight,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.white24),
-                                      color: Colors.black54,
-                                      borderRadius: BorderRadius.only(
-                                        bottomRight: Radius.circular(30),
-                                        topLeft: Radius.circular(15),
-                                      ),
-                                    ),
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: 3, horizontal: 10),
-                                    child: Text(
-                                      data.type,
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 20),
-                              child: Text(
-                                "${data.heading.full}",
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      child: projectShowingContainer(data: data,),
                     );
                   },
                   itemCount: projects.length,
@@ -381,32 +433,104 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-    )
-    ;
+    );
   }
 }
+class projectShowingContainer extends StatefulWidget {
+  ProjectConvertor data;
+   projectShowingContainer({super.key,required this.data});
 
-class ProjectsConvertor {
-  String id;
-  final String heading, images, time, VL, type;
+  @override
+  State<projectShowingContainer> createState() => _projectShowingContainerState();
+}
 
-  ProjectsConvertor({
-    this.id = "",
-    required this.heading,
-    required this.images,
-    required this.time,
-    required this.type,
-    required this.VL,
-  });
+class _projectShowingContainerState extends State<projectShowingContainer> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin:
+      EdgeInsets.symmetric(vertical: 2),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(widget.data.heading.short,maxLines: 2,style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),),
+                    Center(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.white12),
+                          color: Colors.black54,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        padding: EdgeInsets.symmetric(
+                            vertical: 3, horizontal: 10),
+                        child: Text(
+                          widget.data.type,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              )),
+              Expanded(
+                child: AspectRatio(
+                  aspectRatio: 16 / 8,
+                  child: Container(
+                    margin: EdgeInsets.symmetric(
+                        horizontal: 2, vertical: 2),
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: NetworkImage(widget.data.Images.main),
+                        fit: BoxFit.cover,
+                      ),
+                      borderRadius: BorderRadius.circular(25),
+                      color: Colors.black12,
+                    ),
 
-  static ProjectsConvertor fromJson(Map<String, dynamic> json) =>
-      ProjectsConvertor(
-          id: json['id'],
-          heading: json["title"],
-          type: json["type"] ?? "",
-          time: json["time"],
-          images: json["Thumbnails"],
-          VL: json["ViewsLikes"]);
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Padding(
+            padding:
+            const EdgeInsets.symmetric(horizontal: 20),
+            child: Text(
+              "${widget.data.heading.full}",
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 18,
+                fontWeight: FontWeight.w300,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class HomePageImagesConvertor {
@@ -550,7 +674,6 @@ class _appBar_HomePageState extends State<appBar_HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    double Size = size(context);
     DateTime now = DateTime.now();
     int currentHour = now.hour;
 
@@ -570,8 +693,7 @@ class _appBar_HomePageState extends State<appBar_HomePage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Padding(
-              padding: EdgeInsets.symmetric(
-                  horizontal: widget.size * 10.0, vertical: widget.size * 5),
+              padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
               child: _isVisible
                   ? TweenAnimationBuilder(
                       tween: Tween<double>(
@@ -579,7 +701,7 @@ class _appBar_HomePageState extends State<appBar_HomePage> {
                       duration: Duration(seconds: 2),
                       builder: (context, value, child) {
                         return Opacity(
-                          opacity: value as double,
+                          opacity: value,
                           child: InkWell(
                             onTap: () {
                               ExternalLaunchUrl(
@@ -587,12 +709,11 @@ class _appBar_HomePageState extends State<appBar_HomePage> {
                               // changeTab(2);
                             },
                             child: Padding(
-                              padding:
-                                  EdgeInsets.symmetric(horizontal: Size * 10),
+                              padding: EdgeInsets.symmetric(horizontal: 10),
                               child: Text(
                                 "NS Ideas",
                                 style: TextStyle(
-                                  fontSize: widget.size * 22.0,
+                                  fontSize: 22.0,
                                   color: Colors.black87,
                                 ),
                               ),
@@ -602,8 +723,7 @@ class _appBar_HomePageState extends State<appBar_HomePage> {
                       },
                     )
                   : Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: widget.size * 8.0),
+                      padding: EdgeInsets.symmetric(horizontal: 8.0),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -611,13 +731,12 @@ class _appBar_HomePageState extends State<appBar_HomePage> {
                           Text(
                             '$greeting',
                             style: TextStyle(
-                                fontSize: widget.size * 14.0,
-                                color: Colors.black54),
+                                fontSize: 14.0, color: Colors.black54),
                           ),
                           Text(
                             "${widget.name.toUpperCase()}",
                             style: TextStyle(
-                              fontSize: widget.size * 16.0,
+                              fontSize: 16.0,
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
                             ),
@@ -657,7 +776,7 @@ class _appBar_HomePageState extends State<appBar_HomePage> {
             width: double.infinity,
             decoration: BoxDecoration(
               color: Colors.black26,
-              borderRadius: BorderRadius.circular(Size * 25),
+              borderRadius: BorderRadius.circular(25),
             ),
             child: Row(
               children: [
@@ -666,13 +785,12 @@ class _appBar_HomePageState extends State<appBar_HomePage> {
                   child: Row(
                     children: [
                       Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: widget.size * 15,
-                            vertical: widget.size * 2),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 15, vertical: 2),
                         child: Icon(
                           Icons.search,
                           color: Colors.white70,
-                          size: widget.size * 25,
+                          size: 25,
                         ),
                       ),
                       Expanded(
@@ -685,7 +803,7 @@ class _appBar_HomePageState extends State<appBar_HomePage> {
                                   Text(
                                     searchList[index],
                                     style: TextStyle(
-                                        fontSize: widget.size * 18.0,
+                                        fontSize: 18.0,
                                         color: Colors.black,
                                         fontWeight: FontWeight.w500),
                                   ),
@@ -700,7 +818,7 @@ class _appBar_HomePageState extends State<appBar_HomePage> {
                             viewportFraction: 0.95,
                             disableCenter: true,
                             enlargeCenterPage: true,
-                            height: widget.size * 40,
+                            height: 40,
                             autoPlayAnimationDuration:
                                 const Duration(seconds: 3),
                             autoPlay: true,
@@ -722,7 +840,7 @@ class _appBar_HomePageState extends State<appBar_HomePage> {
                           EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                       decoration: BoxDecoration(
                         color: Colors.black87,
-                        borderRadius: BorderRadius.circular(Size * 20),
+                        borderRadius: BorderRadius.circular(20),
                       ),
                       child: CarouselSlider(
                         items: List.generate(
@@ -736,7 +854,7 @@ class _appBar_HomePageState extends State<appBar_HomePage> {
                                     Text(
                                       notificationsList[index],
                                       style: TextStyle(
-                                          fontSize: widget.size * 13.0,
+                                          fontSize: 13.0,
                                           color: Colors.white,
                                           fontWeight: FontWeight.w800),
                                     ),
@@ -750,7 +868,7 @@ class _appBar_HomePageState extends State<appBar_HomePage> {
                           viewportFraction: 0.95,
                           disableCenter: true,
                           enlargeCenterPage: true,
-                          height: widget.size * 25,
+                          height: 25,
                           autoPlayAnimationDuration: const Duration(seconds: 3),
                           autoPlay: true,
                         ),
@@ -771,5 +889,187 @@ Future<void> ExternalLaunchUrl(String url) async {
   final Uri urlIn = Uri.parse(url);
   if (!await launchUrl(urlIn, mode: LaunchMode.externalApplication)) {
     throw 'Could not launch $urlIn';
+  }
+}
+
+Stream<List<arduinoBoardsConvertor>> readarduinoBoards() =>
+    FirebaseFirestore.instance
+        .collection('others')
+        .doc("arduinoBoards")
+        .collection("boards")
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => arduinoBoardsConvertor.fromJson(doc.data()))
+            .toList());
+
+class arduinoBoardsConvertor {
+  String id;
+  final HeadingConvertor heading;
+  final String about;
+  final List<String> images, pinDiagrams;
+  final List<DescriptionConvertor> descriptions;
+
+  arduinoBoardsConvertor({
+    this.id = "",
+    required this.heading,
+    required this.images,
+    required this.descriptions,
+    required this.about,
+    required this.pinDiagrams,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'heading': heading.toJson(),
+        'images': images,
+        "descriptions": descriptions.map((unit) => unit.toJson()).toList(),
+        'about': about,
+        'pinDiagrams': pinDiagrams,
+      };
+
+  static arduinoBoardsConvertor fromJson(Map<String, dynamic> json) =>
+      arduinoBoardsConvertor(
+        id: json['id'],
+        descriptions:
+            DescriptionConvertor.fromMapList(json['descriptions'] ?? []),
+        heading: HeadingConvertor.fromJson(json["heading"]),
+        images: List<String>.from(json["images"]),
+        about: json["about"],
+        pinDiagrams: List<String>.from(json["pinDiagrams"]),
+      );
+
+  static List<arduinoBoardsConvertor> fromMapList(List<dynamic> list) {
+    return list.map((item) => fromJson(item)).toList();
+  }
+}
+
+class arduinoBoard extends StatefulWidget {
+  arduinoBoardsConvertor data;
+
+  arduinoBoard({
+    Key? key,
+    required this.data,
+  }) : super(key: key);
+
+  @override
+  State<arduinoBoard> createState() => _arduinoBoardState();
+}
+
+class _arduinoBoardState extends State<arduinoBoard> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                backButton(  text: widget.data.heading.short,),
+                Padding(
+                  padding: EdgeInsets.all(4.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (widget.data.images.isNotEmpty)
+                        Padding(
+                          padding: EdgeInsets.all(5.0),
+                          child: scrollingImages(
+                            images: widget.data.images,
+                            id: widget.data.id,
+                            isZoom: true,
+                          ),
+                        ),
+                      if (widget.data.heading.full.isNotEmpty)
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            widget.data.heading.full,
+                            style: TextStyle(fontSize: 18, color: Colors.black),
+                          ),
+                        ),
+                      if (widget.data.about.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10.0),
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Container(
+                                        margin:
+                                            EdgeInsets.symmetric(horizontal: 10),
+                                        height: 1,
+                                        color: Colors.black26,
+                                      ),
+                                    ),
+                                    Text(
+                                      "About",
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                    Expanded(
+                                      child: Container(
+                                        margin:
+                                            EdgeInsets.symmetric(horizontal: 10),
+                                        height: 1,
+                                        color: Colors.black26,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                      left: 10, right: 10, bottom: 15, top: 3),
+                                  child: StyledTextWidget(
+                                    text: '${widget.data.about}',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                    ],
+                  ),
+                ),
+                Description(
+                  id: widget.data.id,
+                  data: widget.data.descriptions,
+                ),
+                if (widget.data.pinDiagrams.isNotEmpty)
+                  Padding(
+                    padding: EdgeInsets.only(left: 10, top: 20, bottom: 10),
+                    child: Text(
+                      "PinOut",
+                      style: TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white),
+                    ),
+                  ),
+                scrollingImages(
+                  images: widget.data.pinDiagrams,
+                  id: widget.data.id,
+                  isZoom: true,
+                ),
+                Center(
+                    child: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    "---${widget.data.heading.full}---",
+                    style: TextStyle(fontSize: 10, color: Colors.white),
+                  ),
+                )),
+              ],
+            ),
+          ),
+        ));
   }
 }
