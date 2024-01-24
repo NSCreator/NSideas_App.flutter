@@ -1,8 +1,11 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:nsideas/test.dart';
 import 'package:nsideas/textFeild.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'homePage.dart';
 
 
 Future<List<ProjectConvertor>> getBranchStudyMaterials(bool isLoading) async {
@@ -25,6 +28,56 @@ Future<List<ProjectConvertor>> getBranchStudyMaterials(bool isLoading) async {
     List<dynamic> projectsJsonList = json.decode(studyMaterialsJson);
     List<ProjectConvertor> projects = projectsJsonList
         .map((json) => ProjectConvertor.fromJson(json))
+        .toList();
+
+    return projects;
+  }
+}
+Future<List<SensorsConverter>> getSensors(bool isLoading) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  final studyMaterialsJson = prefs.getString("sensors") ?? "";
+
+  if (studyMaterialsJson.isEmpty || isLoading) {
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('sensors').get();
+    List<Map<String, dynamic>> projectsData = querySnapshot.docs
+        .map((doc) => doc.data() as Map<String, dynamic>)
+        .toList();
+    String projectsJson = jsonEncode(projectsData);
+    await prefs.setString("sensors", projectsJson);
+    List<SensorsConverter> projects =
+        projectsData.map((json) => SensorsConverter.fromJson(json)).toList();
+    return projects;
+  } else {
+    List<dynamic> projectsJsonList = json.decode(studyMaterialsJson);
+    List<SensorsConverter> projects = projectsJsonList
+        .map((json) => SensorsConverter.fromJson(json))
+        .toList();
+
+    return projects;
+  }
+}
+Future<List<BoardsConvertor>> getBoards(bool isLoading) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  final Boards = prefs.getString("boards") ?? "";
+
+  if (Boards.isEmpty || isLoading) {
+    QuerySnapshot querySnapshot =
+    await FirebaseFirestore.instance.collection('boards').get();
+    List<Map<String, dynamic>> projectsData = querySnapshot.docs
+        .map((doc) => doc.data() as Map<String, dynamic>)
+        .toList();
+    String projectsJson = jsonEncode(projectsData);
+    await prefs.setString("boards", projectsJson);
+    List<BoardsConvertor> projects =
+    projectsData.map((json) => BoardsConvertor.fromJson(json)).toList();
+    return projects;
+  } else {
+    List<dynamic> projectsJsonList = json.decode(Boards);
+    List<BoardsConvertor> projects = projectsJsonList
+        .map((json) => BoardsConvertor.fromJson(json))
         .toList();
 
     return projects;

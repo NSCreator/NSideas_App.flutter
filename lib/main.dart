@@ -1,17 +1,20 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:nsideas/homePage.dart';
-import 'package:nsideas/test.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:nsideas/settings.dart';
+import 'firebase_options.dart';
+import 'functions.dart';
+import 'homePage.dart';
+import 'projects.dart';
+import 'subPage.dart';
+import 'test.dart';
+import 'textFeild.dart';
 
-
-fullUserId() {
-  var user = FirebaseAuth.instance.currentUser!.email!;
-  return user;
-}
 
 Future<void> backgroundHandler(RemoteMessage message) async {
   print(message.data.toString());
@@ -20,10 +23,8 @@ Future<void> backgroundHandler(RemoteMessage message) async {
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // MobileAds.instance.initialize();
-  await Firebase.initializeApp(
-      // options: DefaultFirebaseOptions.currentPlatform
-      );
+  MobileAds.instance.initialize();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FirebaseMessaging.onBackgroundMessage(backgroundHandler);
   runApp(MyApp());
 }
@@ -68,7 +69,7 @@ class _MyAppState extends State<MyApp> {
         splashColor: Colors.transparent,
         splashFactory: NoSplash.splashFactory,
       ),
-      home: sensorsCreator(),
+      home: HomePage(),
       // home: StreamBuilder<User?>(
       //     stream: FirebaseAuth.instance.authStateChanges(),
       //     builder: (context, snapshot) {

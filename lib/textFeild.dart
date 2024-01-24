@@ -964,8 +964,7 @@ class _DescriptionCreatorState extends State<DescriptionCreator> {
                     InkWell(
                         onTap: () async {
                           await FirebaseFirestore.instance
-                              .collection('others')
-                              .doc("arduinoBoards")
+                             
                               .collection("boards")
                               .doc(widget.id)
                               .update({
@@ -1071,6 +1070,7 @@ class _arduinoBoardCreatorState extends State<arduinoBoardCreator> {
   final AboutController = TextEditingController();
   final PhotoUrl = TextEditingController();
   final CircuitDiagram = TextEditingController();
+  final TypeController = TextEditingController();
 
   @override
   void initState() {
@@ -1157,6 +1157,18 @@ class _arduinoBoardCreatorState extends State<arduinoBoardCreator> {
                     hintStyle: TextStyle(color: Colors.black54)),
               ),
             ),
+            TextFieldContainer(
+              heading: "Board Type",
+              child: TextFormField(
+                controller: TypeController,
+                textInputAction: TextInputAction.next,
+                style: TextStyle(color: Colors.black, fontSize: 20),
+                decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    hintText: 'Enter Type Here',
+                    hintStyle: TextStyle(color: Colors.black54)),
+              ),
+            ),
             const SizedBox(
               height: 10,
             ),
@@ -1187,11 +1199,10 @@ class _arduinoBoardCreatorState extends State<arduinoBoardCreator> {
                     onTap: () async {
                       String id = getID();
                       await FirebaseFirestore.instance
-                          .collection('others')
-                          .doc("arduinoBoards")
+
                           .collection("boards")
                           .doc(id)
-                          .set(arduinoBoardsConvertor(
+                          .set(BoardsConvertor(
                         id: id,
                         heading: HeadingConvertor(
                           full: fullController.text,
@@ -1199,6 +1210,7 @@ class _arduinoBoardCreatorState extends State<arduinoBoardCreator> {
                         ),
                         images: [PhotoUrl.text],
                         about: AboutController.text,
+                        type: TypeController.text,
                         pinDiagrams: [CircuitDiagram.text], descriptions: [],
                       ).toJson());
                       Navigator.pop(context);

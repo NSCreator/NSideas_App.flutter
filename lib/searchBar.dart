@@ -122,10 +122,10 @@ class _searchBarState extends State<searchBar> {
                       final data = widget.projects[index];
                       return data.heading.short
                                   .toLowerCase()
-                                  .startsWith(name.toLowerCase()) ||
+                                  .contains(name.toLowerCase()) ||
                               data.heading.full
                                   .toLowerCase()
-                                  .startsWith(name.toLowerCase()) ||
+                                  .contains(name.toLowerCase()) ||
                               data.tags.contains(name.toUpperCase())
                           ? InkWell(
                             child: Container(

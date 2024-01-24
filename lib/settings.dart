@@ -22,7 +22,7 @@ const TextStyle HeadingsTextStyle = TextStyle(
 );
 
 isUser() {
-  return false;
+  return true;
   // return FirebaseAuth.instance.currentUser!.email! == "sujithnimmala03@gmail.com";
 }
 
@@ -36,195 +36,196 @@ class settings extends StatefulWidget {
 class _settingsState extends State<settings> {
   @override
   Widget build(BuildContext context) {
-    return backGroundImage(
-        text: "Settings",
-        child: Column(
+    return Scaffold(
+
+        body: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (isUser())
-              ElevatedButton(
-                  onPressed: () {
-                    CreateSubject(
-                        id: getID(),
-                        youtubeLink: "sdasdsad",
-                        isUpdate: false,
-                        Branch: "",
-                        Heading: HeadingConvertor(full: "full", short: "short"),
-                        about: "Description",
-                        ComponentsAndSupplies: [
-                          convertorForTRCSRC(
-                              heading: "heading", link: "link", image: "image")
-                        ],
-                        toolsRequired: [
-                          convertorForTRCSRC(
-                              heading: "heading", link: "link", image: "image")
-                        ],
-                        description: [],
-                        Images: ImagesConvertor(
-                            main:
-                                "https://c1.wallpaperflare.com/preview/398/896/843/arduino-electronics-integrated-circuit-ic.jpg",
-                            diagram:
-                                "https://img.youtube.com/vi/5Wpju1yZulY/maxresdefault.jpg"),
-                        type: 'Arduino',
-                        tags: ["BC547", "Arduino", "projects"],
-                        tableOfContent: [
-                          "table of content",
-                          "lldflkdfw",
-                          "wrjfhwjhfjrfrf"
-                        ],
-                        appAndPlatforms: [
-                          convertorForTRCSRC(
-                              heading: "heading", link: "link", image: "image")
-                        ]);
-                  },
-                  child: Text("Create Project")),
-            if (isUser())InkWell(
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  color: Colors.black.withOpacity(0.4),
-                ),
-                width: double.infinity,
-                child: const Padding(
-                  padding: EdgeInsets.all(11.0),
-                  child: Text(
-                    "Add Arduino Board",
-                    style: TextStyle(fontSize: 23, color: Colors.white),
-                  ),
-                ),
-              ),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => arduinoBoardCreator()));
-              },
-            ),
-
-
-            StreamBuilder<List<followUsConvertor>>(
-                stream: readfollowUs(),
-                builder: (context, snapshot) {
-                  final Books = snapshot.data;
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.waiting:
-                      return const Center(
-                          child: CircularProgressIndicator(
-                        strokeWidth: 0.3,
-                        color: Colors.cyan,
-                      ));
-                    default:
-                      if (snapshot.hasError) {
-                        return const Center(
-                            child: Text(
-                                'Error with TextBooks Data or\n Check Internet Connection'));
-                      } else {
-                        if (Books!.isEmpty) {
-                          return const Center(
-                            child: Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text(
-                                "No Treading Projects",
-                                style: TextStyle(
-                                  color: Color.fromRGBO(195, 228, 250, 1),
-                                ),
-                              ),
-                            ),
-                          );
-                        } else {
-                          return Container(
-                            margin: EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 10),
-                            padding:
-                                EdgeInsets.only(top: 10, bottom: 15, left: 10),
-                            decoration: BoxDecoration(
-                                color: Colors.black12,
-                                borderRadius: BorderRadius.circular(20)),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Padding(
-                                  padding: EdgeInsets.only(bottom: 8),
-                                  child: Text(
-                                    "Follow Us",
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w800,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 40,
-                                  child: ListView.separated(
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount: Books.length,
-                                    itemBuilder:
-                                        (BuildContext context, int index) =>
-                                            InkWell(
-                                      child: Padding(
-                                        padding: EdgeInsets.only(
-                                            left: index == 0 ? 20 : 3),
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                              color: const Color.fromRGBO(
-                                                  174, 228, 242, 0.15),
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(15),
-                                            color:
-                                                Colors.black.withOpacity(0.3),
-                                            // border: Border.all(color: Colors.white),
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(15),
-                                                  color: Colors.black
-                                                      .withOpacity(0.4),
-                                                  image: DecorationImage(
-                                                    image: NetworkImage(
-                                                      Books[index].photoUrl,
-                                                    ),
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                                height: 35,
-                                                width: 50,
-                                              ),
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.all(5.0),
-                                                child: Text(
-                                                  Books[index].name,
-                                                  style: const TextStyle(
-                                                      fontSize: 16,
-                                                      color: Colors.white),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    shrinkWrap: true,
-                                    separatorBuilder: (context, index) =>
-                                        const SizedBox(
-                                      width: 9,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-                      }
-                  }
-                }),
+            Text("settings",style: TextStyle(fontSize: 20),),
+            // if (isUser())
+            //   ElevatedButton(
+            //       onPressed: () {
+            //         CreateSubject(
+            //             id: getID(),
+            //             youtubeLink: "sdasdsad",
+            //             isUpdate: false,
+            //             Branch: "",
+            //             Heading: HeadingConvertor(full: "full", short: "short"),
+            //             about: "Description",
+            //             ComponentsAndSupplies: [
+            //               convertorForTRCSRC(
+            //                   heading: "heading", link: "link", image: "image")
+            //             ],
+            //             toolsRequired: [
+            //               convertorForTRCSRC(
+            //                   heading: "heading", link: "link", image: "image")
+            //             ],
+            //             description: [],
+            //             Images: ImagesConvertor(
+            //                 main:
+            //                     "https://c1.wallpaperflare.com/preview/398/896/843/arduino-electronics-integrated-circuit-ic.jpg",
+            //                 diagram:
+            //                     "https://img.youtube.com/vi/5Wpju1yZulY/maxresdefault.jpg"),
+            //             type: 'Arduino',
+            //             tags: ["BC547", "Arduino", "projects"],
+            //             tableOfContent: [
+            //               "table of content",
+            //               "lldflkdfw",
+            //               "wrjfhwjhfjrfrf"
+            //             ],
+            //             appAndPlatforms: [
+            //               convertorForTRCSRC(
+            //                   heading: "heading", link: "link", image: "image")
+            //             ]);
+            //       },
+            //       child: Text("Create Project")),
+            // if (isUser())InkWell(
+            //   child: Container(
+            //     decoration: BoxDecoration(
+            //       borderRadius: BorderRadius.circular(15),
+            //       color: Colors.black.withOpacity(0.4),
+            //     ),
+            //     width: double.infinity,
+            //     child: const Padding(
+            //       padding: EdgeInsets.all(11.0),
+            //       child: Text(
+            //         "Add Arduino Board",
+            //         style: TextStyle(fontSize: 23, color: Colors.white),
+            //       ),
+            //     ),
+            //   ),
+            //   onTap: () {
+            //     Navigator.push(
+            //         context,
+            //         MaterialPageRoute(
+            //             builder: (context) => arduinoBoardCreator()));
+            //   },
+            // ),
+            //
+            //
+            // StreamBuilder<List<followUsConvertor>>(
+            //     stream: readfollowUs(),
+            //     builder: (context, snapshot) {
+            //       final Books = snapshot.data;
+            //       switch (snapshot.connectionState) {
+            //         case ConnectionState.waiting:
+            //           return const Center(
+            //               child: CircularProgressIndicator(
+            //             strokeWidth: 0.3,
+            //             color: Colors.cyan,
+            //           ));
+            //         default:
+            //           if (snapshot.hasError) {
+            //             return const Center(
+            //                 child: Text(
+            //                     'Error with TextBooks Data or\n Check Internet Connection'));
+            //           } else {
+            //             if (Books!.isEmpty) {
+            //               return const Center(
+            //                 child: Padding(
+            //                   padding: EdgeInsets.all(8.0),
+            //                   child: Text(
+            //                     "No Treading Projects",
+            //                     style: TextStyle(
+            //                       color: Color.fromRGBO(195, 228, 250, 1),
+            //                     ),
+            //                   ),
+            //                 ),
+            //               );
+            //             } else {
+            //               return Container(
+            //                 margin: EdgeInsets.symmetric(
+            //                     vertical: 10, horizontal: 10),
+            //                 padding:
+            //                     EdgeInsets.only(top: 10, bottom: 15, left: 10),
+            //                 decoration: BoxDecoration(
+            //                     color: Colors.black12,
+            //                     borderRadius: BorderRadius.circular(20)),
+            //                 child: Column(
+            //                   crossAxisAlignment: CrossAxisAlignment.start,
+            //                   children: [
+            //                     const Padding(
+            //                       padding: EdgeInsets.only(bottom: 8),
+            //                       child: Text(
+            //                         "Follow Us",
+            //                         style: TextStyle(
+            //                           fontSize: 20,
+            //                           fontWeight: FontWeight.w800,
+            //                           color: Colors.black,
+            //                         ),
+            //                       ),
+            //                     ),
+            //                     SizedBox(
+            //                       height: 40,
+            //                       child: ListView.separated(
+            //                         scrollDirection: Axis.horizontal,
+            //                         itemCount: Books.length,
+            //                         itemBuilder:
+            //                             (BuildContext context, int index) =>
+            //                                 InkWell(
+            //                           child: Padding(
+            //                             padding: EdgeInsets.only(
+            //                                 left: index == 0 ? 20 : 3),
+            //                             child: Container(
+            //                               decoration: BoxDecoration(
+            //                                 border: Border.all(
+            //                                   color: const Color.fromRGBO(
+            //                                       174, 228, 242, 0.15),
+            //                                 ),
+            //                                 borderRadius:
+            //                                     BorderRadius.circular(15),
+            //                                 color:
+            //                                     Colors.black.withOpacity(0.3),
+            //                                 // border: Border.all(color: Colors.white),
+            //                               ),
+            //                               child: Row(
+            //                                 children: [
+            //                                   Container(
+            //                                     decoration: BoxDecoration(
+            //                                       borderRadius:
+            //                                           BorderRadius.circular(15),
+            //                                       color: Colors.black
+            //                                           .withOpacity(0.4),
+            //                                       image: DecorationImage(
+            //                                         image: NetworkImage(
+            //                                           Books[index].photoUrl,
+            //                                         ),
+            //                                         fit: BoxFit.cover,
+            //                                       ),
+            //                                     ),
+            //                                     height: 35,
+            //                                     width: 50,
+            //                                   ),
+            //                                   Padding(
+            //                                     padding:
+            //                                         const EdgeInsets.all(5.0),
+            //                                     child: Text(
+            //                                       Books[index].name,
+            //                                       style: const TextStyle(
+            //                                           fontSize: 16,
+            //                                           color: Colors.white),
+            //                                     ),
+            //                                   ),
+            //                                 ],
+            //                               ),
+            //                             ),
+            //                           ),
+            //                         ),
+            //                         shrinkWrap: true,
+            //                         separatorBuilder: (context, index) =>
+            //                             const SizedBox(
+            //                           width: 9,
+            //                         ),
+            //                       ),
+            //                     ),
+            //                   ],
+            //                 ),
+            //               );
+            //             }
+            //           }
+            //       }
+            //     }),
 
             // Center(
             //   child: InkWell(
@@ -392,6 +393,19 @@ class _settingsState extends State<settings> {
                 ),
               ),
             ),
+            // Container(
+            //     width: double.infinity,
+            //     padding: EdgeInsets.symmetric( vertical: 5),
+            //     margin: EdgeInsets.symmetric( vertical: 15,horizontal: 20),
+            //     decoration: BoxDecoration(
+            //         color: Colors.black.withOpacity(0.1),
+            //         borderRadius: BorderRadius.circular(8)),
+            //     child: Center(
+            //       child: Text(
+            //         "Log Out",
+            //         style: TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
+            //       ),
+            //     )),
           ],
         ));
   }
