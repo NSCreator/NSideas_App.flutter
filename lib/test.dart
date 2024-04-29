@@ -1,995 +1,730 @@
-// @immutable
-import 'package:carousel_slider/carousel_controller.dart';
+// ignore_for_file: camel_case_types, non_constant_identifier_names, must_be_immutable, prefer_const_constructors, use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:nsideas/projects.dart';
-import 'textFeild.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter/widgets.dart';
+import 'package:nsideas/project_files/projects_test.dart';
+import 'package:nsideas/project_files/sub_page.dart';
+import 'package:nsideas/sensors/sub_page.dart';
+import 'package:nsideas/uploader/telegram_uploader.dart';
 
 import 'functions.dart';
-import 'homePage.dart';
 
-class SensorsCreator extends StatefulWidget {
+class ProjectCreator extends StatefulWidget {
+  ProjectConverter? data;
 
-
-  SensorsCreator() ;
+  ProjectCreator({
+    super.key,
+    this.data,
+  });
 
   @override
-  State<SensorsCreator> createState() => _SensorsCreatorState();
+  State<ProjectCreator> createState() => _ProjectCreatorState();
 }
 
-class _SensorsCreatorState extends State<SensorsCreator> {
-  List<String> pinDiagramsList = [];
-  final TextEditingController _pinDiagramController = TextEditingController();
-  int selectedPointIndex = -1;
+class _ProjectCreatorState extends State<ProjectCreator> {
+  final HeadingFirstController = TextEditingController();
+  final HeadingLastController = TextEditingController();
+  final DescriptionController = TextEditingController();
+  final tableOfContentController = TextEditingController();
+  final TypeController = TextEditingController();
+  final YoutubeLinkController = TextEditingController();
+  List<IVFUploader> iv = [];
 
-  TextEditingController ShortHeadingController = TextEditingController();
-  TextEditingController FullHeadingController = TextEditingController();
-  TextEditingController AboutHeadingController = TextEditingController();
-  TextEditingController TypeController = TextEditingController();
+  void AutoFill() {
 
-  List<String> ImageList = ["dd"];
-  final TextEditingController _ImageController = TextEditingController();
-  int selectedImageIndex = -1;
+    setState(() {
+      isFree = widget.data!.isFree;
+      isContainsAds = widget.data!.isContainsAds;
+      descriptionList = widget.data!.description;
+      HeadingFirstController.text = widget.data!.heading.short;
+      HeadingLastController.text = widget.data!.heading.full;
+      TypeController.text = widget.data!.type;
+      YoutubeLinkController.text = widget.data!.youtubeUrl;
+      iv = widget.data!.images;
+      DescriptionController.text = widget.data!.about;
+      tableOfContentList = widget.data!.tableOfContent;
+      TagsList = widget.data!.tags;
+      appAndPlatforms = widget.data!.appAndPlatforms;
+      toolsRequired = widget.data!.toolsRequired;
+      ComponentsAndSupplies = widget.data!.componentsAndSupplies;
+
+    });
+  }
 
   @override
   void initState() {
+    if (widget.data != null) AutoFill();
     super.initState();
-    autoFill();
   }
 
-  autoFill() {}
+  int selectedFilesIndex = -1;
+  final TextEditingController _HeadingFilesController = TextEditingController();
+  final TextEditingController _DataFilesController = TextEditingController();
+  final TextEditingController _TypeFilesController = TextEditingController();
 
-  void addPinDiagrams() {
-    String pinDiagrams = _pinDiagramController.text;
-    if (pinDiagrams.isNotEmpty) {
-      setState(() {
-        pinDiagramsList.add(pinDiagrams);
-        _pinDiagramController.clear();
-      });
-    }
-  }
+  // void addFiles() {
+  //   setState(() {
+  //     appAndPlatforms.add(ConvertorForTRCSRC(
+  //         heading: _HeadingFilesController.text,
+  //         path: _TypeFilesController.text, IVF:
+  //     ));
+  //     _HeadingFilesController.clear();
+  //     _DataFilesController.clear();
+  //     _TypeFilesController.clear();
+  //   });
+  // }
+  //
+  // void editFiles(int index) {
+  //   setState(() {
+  //     selectedFilesIndex = index;
+  //     _HeadingFilesController.text = appAndPlatforms[index].heading;
+  //     _DataFilesController.text = appAndPlatforms[index].image;
+  //     _TypeFilesController.text = appAndPlatforms[index].path;
+  //   });
+  // }
 
-  void editPinDiagrams(int index) {
-    setState(() {
-      selectedPointIndex = index;
-      _pinDiagramController.text = pinDiagramsList[index];
-    });
-  }
+  // void saveFiles() {
+  //   if (selectedFilesIndex != -1) {
+  //     setState(() {
+  //       items[selectedFilesIndex].heading = _HeadingFilesController.text;
+  //       items[selectedFilesIndex].image = _DataFilesController.text;
+  //       items[selectedFilesIndex].link = _TypeFilesController.text;
+  //
+  //       _HeadingFilesController.clear();
+  //       _DataFilesController.clear();
+  //       _TypeFilesController.clear();
+  //
+  //       selectedFilesIndex = -1;
+  //     });
+  //   }
+  // }
+  bool isFree = true;
+  bool isContainsAds = true;
+  List<DescriptionConvertor> descriptionList = [];
+  List<ConvertorForTRCSRC> ComponentsAndSupplies = [];
+  final TextEditingController Heading_ConvertorForTRCSRC_Controller =
+      TextEditingController();
+  final TextEditingController PathName_ConvertorForTRCSRC_Controller =
+      TextEditingController();
+  final TextEditingController PathId_ConvertorForTRCSRC_Controller =
+      TextEditingController();
+  IVFUploader? IVF_ComponentsAndSupplies;
 
-  void savePinDiagrams() {
-    String editedPoint = _pinDiagramController.text;
-    if (editedPoint.isNotEmpty && selectedPointIndex != -1) {
-      setState(() {
-        pinDiagramsList[selectedPointIndex] = editedPoint;
-        _pinDiagramController.clear();
-        selectedPointIndex = -1;
-      });
-    }
-  }
+  List<ConvertorForTRCSRC> appAndPlatforms = [];
 
-  void deletePinDiagrams(int index) {
-    setState(() {
-      pinDiagramsList.removeAt(index);
-      if (selectedPointIndex == index) {
-        selectedPointIndex = -1;
-        _pinDiagramController.clear();
-      }
-    });
-  }
+  IVFUploader? IVF_appAndPlatforms;
+  int selectedConvertorForTRCSRC = -1;
 
-  void movePinDiagramUp(int index) {
-    if (index > 0) {
-      setState(() {
-        String point = pinDiagramsList.removeAt(index);
-        pinDiagramsList.insert(index - 1, point);
-        if (selectedPointIndex == index) {
-          selectedPointIndex--;
-        }
-      });
-    }
-  }
+  List<ConvertorForTRCSRC> toolsRequired = [];
 
-  void movePinDiagramDown(int index) {
-    if (index < pinDiagramsList.length - 1) {
-      setState(() {
-        String point = pinDiagramsList.removeAt(index);
-        pinDiagramsList.insert(index + 1, point);
-        if (selectedPointIndex == index) {
-          selectedPointIndex++;
-        }
-      });
-    }
-  }
+  IVFUploader? IVF_toolsRequired;
+  int selectedImageIndex = -1;
 
-  List<TableConvertor> tableList = [];
-  TextEditingController col0Controller = TextEditingController();
-  TextEditingController col1Controller = TextEditingController();
-  int selectedTableIndex = -1;
+  List<String> tableOfContentList = [];
+  final TextEditingController _tableOfContentController =
+      TextEditingController();
+  int selectedtableOfContentIndex = -1;
 
-  void addTable() {
-    setState(() {
-      tableList.add(
-          TableConvertor(col0: col0Controller.text, col1: col1Controller.text));
-      col0Controller.clear();
-      col1Controller.clear();
-    });
-  }
+  List<String> TagsList = [];
+  final TextEditingController _TagsController = TextEditingController();
+  int selectedTagsIndex = -1;
 
-  void editTable(int index) {
-    TableConvertor selectedPoint = tableList[index];
-    setState(() {
-      selectedPointIndex = index;
-      col0Controller.text = selectedPoint.col0;
-      col1Controller.text = selectedPoint.col1;
-    });
-  }
-
-  void saveEditedTable() {
-    String newName = col0Controller.text;
-    String newScoreText = col1Controller.text;
-
-    if (newName.isNotEmpty &&
-        newScoreText.isNotEmpty &&
-        selectedPointIndex != -1) {
-      TableConvertor selectedPoint = tableList[selectedPointIndex];
-      setState(() {
-        selectedPoint.col0 = newName;
-        selectedPoint.col1 = newScoreText;
-        selectedPointIndex = -1;
-        col0Controller.clear();
-        col1Controller.clear();
-      });
-    }
-  }
-
-  void deleteTable(int index) {
-    setState(() {
-      tableList.removeAt(index);
-      if (selectedPointIndex == index) {
-        selectedPointIndex = -1;
-        col0Controller.clear();
-        col1Controller.clear();
-      }
-    });
-  }
-
-  void moveTableUp(int index) {
-    if (index > 0) {
-      setState(() {
-        TableConvertor currentPoint = tableList[index];
-        tableList.removeAt(index);
-        tableList.insert(index - 1, currentPoint);
-      });
-    }
-  }
-
-  void moveTableDown(int index) {
-    if (index < tableList.length - 1) {
-      setState(() {
-        TableConvertor currentPoint = tableList[index];
-        tableList.removeAt(index);
-        tableList.insert(index + 1, currentPoint);
-      });
-    }
-  }
-
-  List<TableConvertor> pinConnectionsList = [];
-  TextEditingController col0pinConnectionsController = TextEditingController();
-  TextEditingController col1pinConnectionsController = TextEditingController();
-  int selectedpinConnectionsIndex = -1;
-
-  void addpinConnections() {
-    setState(() {
-      pinConnectionsList.add(
-          TableConvertor(col0: col0pinConnectionsController.text, col1: col1pinConnectionsController.text));
-      col0pinConnectionsController.clear();
-      col1pinConnectionsController.clear();
-    });
-  }
-
-  void editpinConnections(int index) {
-    TableConvertor selectedPoint = pinConnectionsList[index];
-    setState(() {
-      selectedpinConnectionsIndex = index;
-      col0pinConnectionsController.text = selectedPoint.col0;
-      col1pinConnectionsController.text = selectedPoint.col1;
-    });
-  }
-
-  void savepinConnections() {
-    String newName = col0pinConnectionsController.text;
-    String newScoreText = col1pinConnectionsController.text;
-
-    if (newName.isNotEmpty &&
-        newScoreText.isNotEmpty &&
-        selectedpinConnectionsIndex != -1) {
-      TableConvertor selectedPoint = pinConnectionsList[selectedpinConnectionsIndex];
-      setState(() {
-        selectedPoint.col0 = newName;
-        selectedPoint.col1 = newScoreText;
-        selectedpinConnectionsIndex = -1;
-        col0pinConnectionsController.clear();
-        col1pinConnectionsController.clear();
-      });
-    }
-  }
-
-  void deletepinConnections(int index) {
-    setState(() {
-      pinConnectionsList.removeAt(index);
-      if (selectedpinConnectionsIndex == index) {
-        selectedpinConnectionsIndex = -1;
-        col0pinConnectionsController.clear();
-        col1pinConnectionsController.clear();
-      }
-    });
-  }
-
-  void movepinConnectionsUp(int index) {
-    if (index > 0) {
-      setState(() {
-        TableConvertor currentPoint = pinConnectionsList[index];
-        pinConnectionsList.removeAt(index);
-        pinConnectionsList.insert(index - 1, currentPoint);
-      });
-    }
-  }
-
-  void movepinConnectionsDown(int index) {
-    if (index < pinConnectionsList.length - 1) {
-      setState(() {
-        TableConvertor currentPoint = pinConnectionsList[index];
-        pinConnectionsList.removeAt(index);
-        pinConnectionsList.insert(index + 1, currentPoint);
-      });
-    }
-  }
-
-  void addImages() {
-    String points = _ImageController.text;
+  void addTags() {
+    String points = _TagsController.text;
     if (points.isNotEmpty) {
       setState(() {
-        ImageList.add(points);
-        _ImageController.clear();
+        TagsList.add(points);
+        _TagsController.clear();
       });
     }
   }
 
-  void editImages(int index) {
+  void editTags(int index) {
     setState(() {
-      selectedImageIndex = index;
-      _ImageController.text = ImageList[index];
+      selectedTagsIndex = index;
+      _TagsController.text = TagsList[index];
     });
   }
 
-  void saveImages() {
-    String editedImage = _ImageController.text;
-    if (editedImage.isNotEmpty && selectedImageIndex != -1) {
+  void saveTags() {
+    String editedImage = _TagsController.text;
+    if (editedImage.isNotEmpty && selectedTagsIndex != -1) {
       setState(() {
-        ImageList[selectedImageIndex] = editedImage;
-        _ImageController.clear();
-        selectedImageIndex = -1;
+        TagsList[selectedImageIndex] = editedImage;
+        _TagsController.clear();
+        selectedTagsIndex = -1;
       });
     }
   }
 
-  void deleteImages(int index) {
+  void deleteTags(int index) {
     setState(() {
-      ImageList.removeAt(index);
-      if (selectedImageIndex == index) {
-        selectedImageIndex = -1;
-        _ImageController.clear();
+      TagsList.removeAt(index);
+      if (selectedTagsIndex == index) {
+        selectedTagsIndex = -1;
+        _TagsController.clear();
       }
     });
   }
 
-  void moveImagesUp(int index) {
+  void moveTagsUp(int index) {
     if (index > 0) {
       setState(() {
-        String point = ImageList.removeAt(index);
-        ImageList.insert(index - 1, point);
-        if (selectedImageIndex == index) {
-          selectedImageIndex--;
+        String point = TagsList.removeAt(index);
+        TagsList.insert(index - 1, point);
+        if (selectedTagsIndex == index) {
+          selectedTagsIndex--;
         }
       });
     }
   }
 
-  void moveImagesDown(int index) {
-    if (index < ImageList.length - 1) {
+  void moveTagsDown(int index) {
+    if (index < TagsList.length - 1) {
       setState(() {
-        String Image = ImageList.removeAt(index);
-        ImageList.insert(index + 1, Image);
-        if (selectedImageIndex == index) {
-          selectedImageIndex++;
+        String Image = TagsList.removeAt(index);
+        TagsList.insert(index + 1, Image);
+        if (selectedTagsIndex == index) {
+          selectedTagsIndex++;
         }
       });
     }
   }
 
+  void addtableOfContent() {
+    String points = _tableOfContentController.text;
+    if (points.isNotEmpty) {
+      setState(() {
+        tableOfContentList.add(points);
+        _tableOfContentController.clear();
+      });
+    }
+  }
 
+  void edittableOfContent(int index) {
+    setState(() {
+      selectedtableOfContentIndex = index;
+      _tableOfContentController.text = tableOfContentList[index];
+    });
+  }
+
+  void savetableOfContent() {
+    String editedImage = _tableOfContentController.text;
+    if (editedImage.isNotEmpty && selectedtableOfContentIndex != -1) {
+      setState(() {
+        tableOfContentList[selectedtableOfContentIndex] = editedImage;
+        _tableOfContentController.clear();
+        selectedtableOfContentIndex = -1;
+      });
+    }
+  }
+
+  void deletetableOfContent(int index) {
+    setState(() {
+      tableOfContentList.removeAt(index);
+      if (selectedtableOfContentIndex == index) {
+        selectedtableOfContentIndex = -1;
+        _tableOfContentController.clear();
+      }
+    });
+  }
+
+  void movetableOfContentUp(int index) {
+    if (index > 0) {
+      setState(() {
+        String point = tableOfContentList.removeAt(index);
+        tableOfContentList.insert(index - 1, point);
+        if (selectedtableOfContentIndex == index) {
+          selectedtableOfContentIndex--;
+        }
+      });
+    }
+  }
+
+  void movetableOfContentDown(int index) {
+    if (index < tableOfContentList.length - 1) {
+      setState(() {
+        String Image = tableOfContentList.removeAt(index);
+        tableOfContentList.insert(index + 1, Image);
+        if (selectedtableOfContentIndex == index) {
+          selectedtableOfContentIndex++;
+        }
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              InkWell(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Wrap(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(left: 10, right: 5),
-                      child: Icon(
-                        Icons.arrow_back,
-                        size: 20,
-                        color: Colors.black,
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        "Back",
-                        style: TextStyle(fontSize: 16, color: Colors.black),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                    ),
-                  ],
-                ),
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            backButton(),
+            const Padding(
+              padding: EdgeInsets.only(left: 15, top: 8),
+              child: Text(
+                "Project Heading",
+                style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black),
               ),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: []),
-                child: Column(
-                  children: [
-                    TextFieldContainer(
-                        heading: "Short",
-                        child: TextFormField(
-                          controller: ShortHeadingController,
-                          textInputAction: TextInputAction.next,
-                          style: TextStyle(color: Colors.black),
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'short',
-                              hintStyle: TextStyle(color: Colors.black)),
-                        )),
-                    TextFieldContainer(
-                        heading: "Full",
-                        child: TextFormField(
-                          controller: FullHeadingController,
-                          textInputAction: TextInputAction.next,
-                          style: TextStyle(color: Colors.black),
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Full',
-                              hintStyle: TextStyle(color: Colors.black)),
-                        ))
-                  ],
-                ),
+            ),
+            TextFieldContainer(
+              child: TextFormField(
+                controller: HeadingFirstController,
+                textInputAction: TextInputAction.next,
+                style: TextStyle(color: Colors.black, fontSize: 20),
+                decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    hintText: 'Short Heading',
+                    hintStyle: TextStyle(color: Colors.black54)),
               ),
-              ListView.builder(
-                itemCount: ImageList.length,
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemBuilder: (context, index) {
-                  return Dismissible(
-                    key: Key(ImageList[index]),
-                    background: Container(
-                      color: Colors.red,
-                      alignment: Alignment.centerRight,
-                      padding: EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Icon(
-                        Icons.delete,
-                        color: Colors.white,
-                      ),
-                    ),
-                    direction: DismissDirection.endToStart,
-                    onDismissed: (direction) {
-                      deleteImages(index);
-                    },
-                    child: ListTile(
-                      title: Text(ImageList[index]),
-                      trailing: SingleChildScrollView(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            IconButton(
-                              icon: Icon(Icons.delete),
-                              onPressed: () {
-                                deleteImages(index);
-                              },
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.edit),
-                              onPressed: () {
-                                editImages(index);
-                              },
-                            ),
-                            InkWell(
-                              child: Icon(
-                                Icons.move_up,
-                                size: 30,
-                              ),
-                              onTap: () {
-                                moveImagesUp(index);
-                              },
-                              onDoubleTap: () {
-                                moveImagesDown(index);
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      onTap: () {
-                        editImages(index);
-                      },
-                    ),
-                  );
-                },
+            ),
+            TextFieldContainer(
+              child: TextFormField(
+                controller: HeadingLastController,
+                textInputAction: TextInputAction.next,
+                style: TextStyle(color: Colors.black, fontSize: 20),
+                decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    hintText: 'Full Heading',
+                    hintStyle: TextStyle(color: Colors.black54)),
               ),
-              Row(
-                children: [
-                  Flexible(
-                    child: TextFieldContainer(
-                        heading: "Images",
-                        child: TextFormField(
-                          controller: _ImageController,
-                          textInputAction: TextInputAction.next,
-                          style: TextStyle(color: Colors.black),
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Images',
-                              hintStyle: TextStyle(color: Colors.black)),
-                        )),
+            ),
+            Uploader(
+              type: FileType.image,
+              path: "projects",
+              allowMultiple: true,
+              getIVF: (data) {
+                setState(() {
+                  iv = data;
+                });
+              },
+              ivf: iv,
+            ),
+            TextFieldContainer(
+              child: TextFormField(
+                controller: TypeController,
+                textInputAction: TextInputAction.next,
+                style: TextStyle(color: Colors.black, fontSize: 20),
+                decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    hintText: 'Projects Type',
+                    hintStyle: TextStyle(color: Colors.black54)),
+              ),
+            ),
+            TextFieldContainer(
+              child: TextFormField(
+                controller: YoutubeLinkController,
+                textInputAction: TextInputAction.next,
+                style: TextStyle(color: Colors.black, fontSize: 20),
+                decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    hintText: 'Youtube Link',
+                    hintStyle: TextStyle(color: Colors.black54)),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 15, top: 8),
+              child: Text(
+                "Tags",
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
+              ),
+            ),
+            ListView.builder(
+              padding: EdgeInsets.zero,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: TagsList.length,
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                return Dismissible(
+                  key: Key(TagsList[index]),
+                  background: Container(
+                    color: Colors.red,
+                    alignment: Alignment.centerRight,
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Icon(
+                      Icons.delete,
+                      color: Colors.black,
+                    ),
                   ),
-                  InkWell(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white12,
-                        border: Border.all(color: Colors.white),
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Icon(
-                        Icons.add,
-                        size: 45,
-                      ),
+                  direction: DismissDirection.endToStart,
+                  onDismissed: (direction) {
+                    deleteTags(index);
+                  },
+                  child: ListTile(
+                    title: Text(
+                      TagsList[index],
+                      style: TextStyle(
+                          color: Colors.black87,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500),
                     ),
-                    onTap: () {
-                      addImages();
-                    },
-                  )
-                ],
-              ),
-              TextFieldContainer(
-                  heading: "About",
-                  child: TextFormField(
-                    controller: AboutHeadingController,
-                    textInputAction: TextInputAction.next,
-                    style: TextStyle(color: Colors.black),
-                    decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: 'About',
-                        hintStyle: TextStyle(color: Colors.black)),
-                  )),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: tableList.length + 1,
-                // Number of rows including the header
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return Table(
-                      border: TableBorder.all(
-                        width: 0.8,
-                        color: Colors.white70,
-                        borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(10),
-                          topLeft: Radius.circular(10),
-                        ),
-                      ),
-                      defaultVerticalAlignment:
-                      TableCellVerticalAlignment.middle,
-                      columnWidths: const {
-                        0: FractionColumnWidth(0.2),
-                        1: FractionColumnWidth(0.6),
-                        2: FractionColumnWidth(0.2),
-                      },
-                      children: [
-                        TableRow(
-                          decoration: BoxDecoration(
-                            color: Colors.grey.withOpacity(0.3),
-                          ),
-                          children: const [
-                            Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text(
-                                'Name',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: Colors.orange,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text(
-                                'Score',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: Colors.orange,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text(
-                                'Actions',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: Colors.orange,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    );
-                  } else {
-                    int dataIndex = index - 1;
-                    TableConvertor point = tableList[dataIndex];
-                    return Table(
-                      border: TableBorder.all(
-                        width: 0.5,
-                        color: Colors.white54,
-                        borderRadius: dataIndex == tableList.length - 1
-                            ? BorderRadius.only(
-                          bottomLeft: Radius.circular(10),
-                          bottomRight: Radius.circular(10),
-                        )
-                            : BorderRadius.circular(0),
-                      ),
-                      defaultVerticalAlignment:
-                      TableCellVerticalAlignment.middle,
-                      columnWidths: const {
-                        0: FractionColumnWidth(0.2),
-                        1: FractionColumnWidth(0.6),
-                        2: FractionColumnWidth(0.2),
-                      },
-                      children: [
-                        TableRow(
-                          children: [
-                            TableCell(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  point.col0,
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                            TableCell(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  point.col1,
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                            TableCell(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    InkWell(
-                                      child: Icon(
-                                        Icons.published_with_changes,
-                                        size: 30,
-                                      ),
-                                      onTap: () {
-                                        editTable(dataIndex);
-                                      },
-                                      onDoubleTap: () {
-                                        deleteTable(dataIndex);
-                                      },
-                                    ),
-                                    InkWell(
-                                      child: Icon(
-                                        Icons.move_up,
-                                        size: 30,
-                                      ),
-                                      onTap: () {
-                                        moveTableUp(dataIndex);
-                                      },
-                                      onDoubleTap: () {
-                                        moveTableDown(dataIndex);
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    );
-                  }
-                },
-              ),
-              Column(
-                children: <Widget>[
-                  Row(
-                    children: [
-                      Flexible(
-                        flex: 3,
-                        child: TextFieldContainer(
-                            heading: "Col 0",
-                            child: TextFormField(
-                              controller: col0Controller,
-                              maxLines: null,
-                              textInputAction: TextInputAction.next,
-                              style: TextStyle(color: Colors.black),
-                              decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: 'Col 0',
-                                  hintStyle: TextStyle(color: Colors.black)),
-                            )),
-                      ),
-                      Flexible(
-                        flex: 6,
-                        child: TextFieldContainer(
-                            heading: "Col 1",
-                            child: TextFormField(
-                              controller: col1Controller,
-                              textInputAction: TextInputAction.next,
-                              style: TextStyle(color: Colors.black),
-                              maxLines: null,
-                              decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: 'Col 1',
-                                  hintStyle: TextStyle(color: Colors.black)),
-                            )),
-                      ),
-                      Flexible(
-                          flex: 1,
-                          child: InkWell(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white12,
-                                border: Border.all(color: Colors.white),
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                              child: Icon(
-                                selectedPointIndex != -1
-                                    ? Icons.save
-                                    : Icons.add,
-                                size: 45,
-                              ),
-                            ),
-                            onTap: () {
-                              selectedPointIndex != -1
-                                  ? saveEditedTable()
-                                  : addTable();
-                              col0pinConnectionsController.clear();
-                              col1pinConnectionsController.clear();
-                            },
-                          ))
-                    ],
-                  ),
-                ],
-              ),
-
-              ListView.builder(
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: pinDiagramsList.length,
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  return Dismissible(
-                    key: Key(pinDiagramsList[index]),
-                    background: Container(
-                      color: Colors.red,
-                      alignment: Alignment.centerRight,
-                      padding: EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Icon(
-                        Icons.delete,
-                        color: Colors.black,
-                      ),
-                    ),
-                    direction: DismissDirection.endToStart,
-                    onDismissed: (direction) {
-                      deletePinDiagrams(index);
-                    },
-                    child: ListTile(
-                      title: selectedPointIndex == index
-                          ? TextField(
-                              textInputAction: TextInputAction.done,
-                              maxLines: null,
-                              controller: _pinDiagramController,
-                              onEditingComplete: savePinDiagrams,
-                            )
-                          : Text(pinDiagramsList[index]),
-                      trailing: Row(
+                    trailing: SingleChildScrollView(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
                           IconButton(
                             icon: Icon(Icons.delete),
                             onPressed: () {
-                              deletePinDiagrams(index);
+                              deleteTags(index);
                             },
                           ),
                           IconButton(
                             icon: Icon(Icons.edit),
                             onPressed: () {
-                              editPinDiagrams(index);
+                              editTags(index);
                             },
                           ),
-                          IconButton(
-                            icon: Icon(Icons.arrow_upward),
-                            onPressed: () {
-                              movePinDiagramUp(index);
+                          InkWell(
+                            child: Icon(
+                              Icons.move_up,
+                              size: 30,
+                            ),
+                            onTap: () {
+                              moveTagsUp(index);
                             },
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.arrow_downward),
-                            onPressed: () {
-                              movePinDiagramDown(index);
+                            onDoubleTap: () {
+                              moveTagsDown(index);
                             },
                           ),
                         ],
                       ),
-                      onTap: () {
-                        editPinDiagrams(index);
-                      },
                     ),
-                  );
-                },
-              ),
-              Row(
-
-                children: [
-                  Flexible(
-                    child:
-                    TextFieldContainer(
-                        heading: "Pin Diagrams",
-                        child: TextFormField(
-                          controller: _pinDiagramController,
-                          textInputAction: TextInputAction.next,
-                          style: TextStyle(color: Colors.black),
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Enter Url Here',
-                              hintStyle: TextStyle(color: Colors.black)),
-                        )),
-
+                    onTap: () {
+                      editTags(index);
+                    },
                   ),
-                  InkWell(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white12,
-                        border: Border.all(color: Colors.white),
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Icon(
-                        Icons.add,
-                        size: 45,
+                );
+              },
+            ),
+            Row(
+              children: [
+                Flexible(
+                  child: TextFieldContainer(
+                    child: TextFormField(
+                      controller: _TagsController,
+                      style: TextStyle(color: Colors.black),
+                      keyboardType: TextInputType.multiline,
+                      maxLines: null,
+                      decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Enter Tags Here',
+                          hintStyle: TextStyle(color: Colors.black),
+                          hoverColor: Colors.black,
+                          labelStyle: TextStyle(color: Colors.black)),
+                    ),
+                  ),
+                ),
+                InkWell(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white12,
+                      border: Border.all(color: Colors.white),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Icon(
+                      Icons.add,
+                      size: 45,
+                    ),
+                  ),
+                  onTap: () {
+                    addTags();
+                  },
+                )
+              ],
+            ),
+            TextFieldContainer(
+              heading: "About Project",
+              child: TextFormField(
+                controller: DescriptionController,
+                textInputAction: TextInputAction.next,
+                style: TextStyle(color: Colors.black, fontSize: 20),
+                decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    hintText: 'Description',
+                    hintStyle: TextStyle(color: Colors.black54)),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 15, top: 8),
+              child: Text(
+                "Table Of Content",
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            ListView.builder(
+              padding: EdgeInsets.zero,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: tableOfContentList.length,
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                return Dismissible(
+                  key: Key(tableOfContentList[index]),
+                  background: Container(
+                    color: Colors.red,
+                    alignment: Alignment.centerRight,
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Icon(
+                      Icons.delete,
+                      color: Colors.white,
+                    ),
+                  ),
+                  direction: DismissDirection.endToStart,
+                  onDismissed: (direction) {
+                    deletetableOfContent(index);
+                  },
+                  child: ListTile(
+                    title: Text(
+                      tableOfContentList[index],
+                      style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500),
+                    ),
+                    trailing: SingleChildScrollView(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          IconButton(
+                            icon: Icon(Icons.delete),
+                            onPressed: () {
+                              deletetableOfContent(index);
+                            },
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.edit),
+                            onPressed: () {
+                              edittableOfContent(index);
+                            },
+                          ),
+                          InkWell(
+                            child: Icon(
+                              Icons.move_up,
+                              size: 30,
+                            ),
+                            onTap: () {
+                              movetableOfContentUp(index);
+                            },
+                            onDoubleTap: () {
+                              movetableOfContentDown(index);
+                            },
+                          ),
+                        ],
                       ),
                     ),
                     onTap: () {
-                      addPinDiagrams();
+                      edittableOfContent(index);
                     },
-                  )
+                  ),
+                );
+              },
+            ),
+            Row(
+              children: [
+                Flexible(
+                  child: TextFieldContainer(
+                    child: TextFormField(
+                      controller: _tableOfContentController,
+                      style: TextStyle(color: Colors.black),
+                      keyboardType: TextInputType.multiline,
+                      maxLines: null,
+                      decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Enter tableOfContent Here',
+                          hintStyle: TextStyle(color: Colors.black),
+                          hoverColor: Colors.black,
+                          labelStyle: TextStyle(color: Colors.black)),
+                    ),
+                  ),
+                ),
+                InkWell(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white12,
+                      border: Border.all(color: Colors.white),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Icon(
+                      Icons.add,
+                      size: 45,
+                    ),
+                  ),
+                  onTap: () {
+                    addtableOfContent();
+                  },
+                )
+              ],
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+              color: Colors.white,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 15, top: 8),
+                    child: Text(
+                      "Description List",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  ReorderableListView(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    padding: EdgeInsets.only(left: 10, right: 10, bottom: 1),
+                    children: List.generate(
+                      descriptionList.length,
+                      (index) => Container(
+                        key: ValueKey(index),
+                        // Assign a unique key to each item
+                        padding:
+                            EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                        margin: EdgeInsets.symmetric(vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                                child: Text(descriptionList[index].heading)),
+                            InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    descriptionList.removeAt(index);
+                                  });
+                                },
+                                child: Icon(Icons.delete))
+                          ],
+                        ),
+                      ),
+                    ),
+                    onReorder: (int oldIndex, int newIndex) {
+                      setState(() {
+                        if (oldIndex < newIndex) {
+                          newIndex -= 1;
+                        }
+                        final DescriptionConvertor item =
+                            descriptionList.removeAt(oldIndex);
+                        descriptionList.insert(newIndex, item);
+                      });
+                    },
+                  ),
                 ],
               ),
-              SizedBox(
-                height: 10,
-              ),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: pinConnectionsList.length + 1,
-                // Number of rows including the header
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return Table(
-                      border: TableBorder.all(
-                        width: 0.8,
-                        color: Colors.white70,
-                        borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(10),
-                          topLeft: Radius.circular(10),
-                        ),
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+              color: Colors.white,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 15, top: 8),
+                    child: Text(
+                      "Components And Supplies",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w500,
                       ),
-                      defaultVerticalAlignment:
-                          TableCellVerticalAlignment.middle,
-                      columnWidths: const {
-                        0: FractionColumnWidth(0.2),
-                        1: FractionColumnWidth(0.6),
-                        2: FractionColumnWidth(0.2),
-                      },
-                      children: [
-                        TableRow(
-                          decoration: BoxDecoration(
-                            color: Colors.grey.withOpacity(0.3),
-                          ),
-                          children: const [
-                            Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text(
-                                'Name',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: Colors.orange,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text(
-                                'Score',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: Colors.orange,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text(
-                                'Actions',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: Colors.orange,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ],
+                    ),
+                  ),
+                  ReorderableListView(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    padding: EdgeInsets.only(left: 10, right: 10, bottom: 1),
+                    children: List.generate(
+                      ComponentsAndSupplies.length,
+                      (index) => Container(
+                        key: ValueKey(index),
+                        // Assign a unique key to each item
+                        padding:
+                            EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                        margin: EdgeInsets.symmetric(vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                      ],
-                    );
-                  } else {
-                    int dataIndex = index - 1;
-                    TableConvertor point = pinConnectionsList[dataIndex];
-                    return Table(
-                      border: TableBorder.all(
-                        width: 0.5,
-                        color: Colors.white54,
-                        borderRadius: dataIndex == pinConnectionsList.length - 1
-                            ? BorderRadius.only(
-                                bottomLeft: Radius.circular(10),
-                                bottomRight: Radius.circular(10),
-                              )
-                            : BorderRadius.circular(0),
+                        child: convertorForTRCSRCContainer(
+                            ComponentsAndSupplies[index], 0, index),
                       ),
-                      defaultVerticalAlignment:
-                          TableCellVerticalAlignment.middle,
-                      columnWidths: const {
-                        0: FractionColumnWidth(0.2),
-                        1: FractionColumnWidth(0.6),
-                        2: FractionColumnWidth(0.2),
-                      },
-                      children: [
-                        TableRow(
-                          children: [
-                            TableCell(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  point.col0,
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                            TableCell(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  point.col1,
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                            TableCell(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    InkWell(
-                                      child: Icon(
-                                        Icons.published_with_changes,
-                                        size: 30,
-                                      ),
-                                      onTap: () {
-                                        editpinConnections(dataIndex);
-                                      },
-                                      onDoubleTap: () {
-                                        deletepinConnections(dataIndex);
-                                      },
-                                    ),
-                                    InkWell(
-                                      child: Icon(
-                                        Icons.move_up,
-                                        size: 30,
-                                      ),
-                                      onTap: () {
-                                        movepinConnectionsUp(dataIndex);
-                                      },
-                                      onDoubleTap: () {
-                                        movepinConnectionsDown(dataIndex);
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    );
-                  }
-                },
-              ),
-              Column(
-                children: <Widget>[
-                  Row(
+                    ),
+                    onReorder: (int oldIndex, int newIndex) {
+                      setState(() {
+                        if (oldIndex < newIndex) {
+                          newIndex -= 1;
+                        }
+                        final ConvertorForTRCSRC item =
+                            ComponentsAndSupplies.removeAt(oldIndex);
+                        ComponentsAndSupplies.insert(newIndex, item);
+                      });
+                    },
+                  ),
+                  Column(
                     children: [
-                      Flexible(
-                        flex: 3,
-                        child: TextFieldContainer(
-                            heading: "Col 0",
-                            child: TextFormField(
-                              controller: col0pinConnectionsController,
-                              maxLines: null,
-                              textInputAction: TextInputAction.next,
-                              style: TextStyle(color: Colors.black),
-                              decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: 'Col 0',
-                                  hintStyle: TextStyle(color: Colors.black)),
-                            )),
+                      Row(
+                        children: [
+                          Flexible(
+                            flex: 5,
+                            child: TextFieldContainer(
+                                heading: "Heading",
+                                child: TextFormField(
+                                  controller: _HeadingFilesController,
+                                  textInputAction: TextInputAction.next,
+                                  style: TextStyle(color: Colors.black),
+                                  decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: 'Heading',
+                                      hintStyle:
+                                          TextStyle(color: Colors.black)),
+                                )),
+                          ),
+                          Flexible(
+                            flex: 2,
+                            child: TextFieldContainer(
+                                heading: "Type",
+                                child: TextFormField(
+                                  controller: _TypeFilesController,
+                                  textInputAction: TextInputAction.next,
+                                  style: TextStyle(color: Colors.black),
+                                  decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: 'type',
+                                      hintStyle:
+                                          TextStyle(color: Colors.black)),
+                                )),
+                          ),
+                        ],
                       ),
-                      Flexible(
-                        flex: 6,
-                        child: TextFieldContainer(
-                            heading: "Col 1",
-                            child: TextFormField(
-                              controller: col1pinConnectionsController,
-                              textInputAction: TextInputAction.next,
-                              style: TextStyle(color: Colors.black),
-                              maxLines: null,
-                              decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: 'Col 1',
-                                  hintStyle: TextStyle(color: Colors.black)),
-                            )),
-                      ),
-                      Flexible(
-                          flex: 1,
-                          child: InkWell(
+                      Row(
+                        children: [
+                          Flexible(
+                            child: TextFieldContainer(
+                                heading: "Data",
+                                child: TextFormField(
+                                  controller: _DataFilesController,
+                                  textInputAction: TextInputAction.next,
+                                  style: TextStyle(color: Colors.black),
+                                  maxLines: null,
+                                  decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: 'data',
+                                      hintStyle:
+                                          TextStyle(color: Colors.black)),
+                                )),
+                          ),
+                          InkWell(
                             child: Container(
                               decoration: BoxDecoration(
                                 color: Colors.white12,
@@ -997,81 +732,449 @@ class _SensorsCreatorState extends State<SensorsCreator> {
                                 borderRadius: BorderRadius.circular(14),
                               ),
                               child: Icon(
-                                selectedPointIndex != -1
-                                    ? Icons.save
-                                    : Icons.add,
+                                Icons.add,
                                 size: 45,
                               ),
                             ),
                             onTap: () {
-                              selectedPointIndex != -1
-                                  ? savepinConnections()
-                                  : addpinConnections();
-                              col0pinConnectionsController.clear();
-                              col1pinConnectionsController.clear();
+                              setState(() {
+                                // ComponentsAndSupplies.add(ConvertorForTRCSRC(
+                                //     heading: _HeadingFilesController.text,
+                                //     image: _DataFilesController.text,
+                                //     path: _TypeFilesController.text));
+                                _HeadingFilesController.clear();
+                                _DataFilesController.clear();
+                                _TypeFilesController.clear();
+                              });
                             },
-                          ))
+                          )
+                        ],
+                      ),
                     ],
                   ),
                 ],
               ),
-              TextFieldContainer(
-                  heading: "Type",
-                  child: TextFormField(
-                    controller: TypeController,
-                    textInputAction: TextInputAction.next,
-                    style: TextStyle(color: Colors.black),
-                    decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: 'Enter Type Here',
-                        hintStyle: TextStyle(color: Colors.black)),
-                  )),
-
-              Padding(
-                padding: EdgeInsets.all(15.0),
-                child: Row(
-                  children: [
-                    Spacer(),
-                    InkWell(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          color: Colors.white.withOpacity(0.5),
-                          border: Border.all(color: Colors.white),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                              left: 10, right: 10, top: 5, bottom: 5),
-                          child: Text("Back"),
-                        ),
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+              color: Colors.white,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 15, top: 8),
+                    child: Text(
+                      "Tools Required",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                    SizedBox(
-                      width: 10,
+                  ),
+                  ReorderableListView(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    padding: EdgeInsets.only(left: 10, right: 10, bottom: 1),
+                    children: List.generate(
+                      toolsRequired.length,
+                      (index) => Container(
+                        key: ValueKey(index),
+                        // Assign a unique key to each item
+                        padding:
+                            EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                        margin: EdgeInsets.symmetric(vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: convertorForTRCSRCContainer(
+                            toolsRequired[index], 0, index),
+                      ),
                     ),
-                    InkWell(
-                        onTap: () async {
-                          String id = getID();
-                          await FirebaseFirestore.instance
-                              .collection('sensors')
-                              .doc(id)
-                              .set(SensorsConverter(
-                            id: id,
-                            heading: HeadingConvertor(
-                              full: FullHeadingController.text,
-                              short: ShortHeadingController.text,
+                    onReorder: (int oldIndex, int newIndex) {
+                      setState(() {
+                        if (oldIndex < newIndex) {
+                          newIndex -= 1;
+                        }
+                        final ConvertorForTRCSRC item =
+                            toolsRequired.removeAt(oldIndex);
+                        toolsRequired.insert(newIndex, item);
+                      });
+                    },
+                  ),
+                  Column(
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(
+                            flex: 5,
+                            child: TextFieldContainer(
+                                heading: "Heading",
+                                child: TextFormField(
+                                  controller: _HeadingFilesController,
+                                  textInputAction: TextInputAction.next,
+                                  style: TextStyle(color: Colors.black),
+                                  decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: 'Heading',
+                                      hintStyle:
+                                          TextStyle(color: Colors.black)),
+                                )),
+                          ),
+                          Flexible(
+                            flex: 2,
+                            child: TextFieldContainer(
+                                heading: "Type",
+                                child: TextFormField(
+                                  controller: _TypeFilesController,
+                                  textInputAction: TextInputAction.next,
+                                  style: TextStyle(color: Colors.black),
+                                  decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: 'type',
+                                      hintStyle:
+                                          TextStyle(color: Colors.black)),
+                                )),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Flexible(
+                            child: TextFieldContainer(
+                                heading: "Data",
+                                child: TextFormField(
+                                  controller: _DataFilesController,
+                                  textInputAction: TextInputAction.next,
+                                  style: TextStyle(color: Colors.black),
+                                  maxLines: null,
+                                  decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: 'data',
+                                      hintStyle:
+                                          TextStyle(color: Colors.black)),
+                                )),
+                          ),
+                          InkWell(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white12,
+                                border: Border.all(color: Colors.white),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: Icon(
+                                Icons.add,
+                                size: 45,
+                              ),
                             ),
-                            images: ImageList,
-                            about: AboutHeadingController.text,
-                            pinDiagrams: pinDiagramsList,
-                            descriptions: [], technicalParameters:tableList , pinConnections: pinConnectionsList, type: TypeController.text,
-                          ).toJson());
-                          Navigator.pop(context);
+                            onTap: () {
+                              // setState(() {
+                              //   toolsRequired.add(ConvertorForTRCSRC(
+                              //       heading: _HeadingFilesController.text,
+                              //
+                              //       path: _TypeFilesController.text, IVF: IVFUploader(type: "", file_url: "", size: "", file_messageId: 0, thumbnail_url: "", thumbnail_messageId: 0)));
+                              //   _HeadingFilesController.clear();
+                              //   _DataFilesController.clear();
+                              //   _TypeFilesController.clear();
+                              // });
+                            },
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+              decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10)),
+              child: Column(
+                children: [
+                  HeadingWithDivider(heading: "Apps And Platforms"),
+                  ReorderableListView(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    children: List.generate(
+                      appAndPlatforms.length,
+                      (index) => Container(
+                        key: ValueKey(index),
+                        // Assign a unique key to each item
+                        padding: EdgeInsets.symmetric(vertical: 5),
+                        margin: EdgeInsets.symmetric(vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: convertorForTRCSRCContainer(
+                            appAndPlatforms[index], 2, index),
+                      ),
+                    ),
+                    onReorder: (int oldIndex, int newIndex) {
+                      setState(() {
+                        if (oldIndex < newIndex) {
+                          newIndex -= 1;
+                        }
+                        final ConvertorForTRCSRC item =
+                            appAndPlatforms.removeAt(oldIndex);
+                        appAndPlatforms.insert(newIndex, item);
+                      });
+                    },
+                  ),
+                  Column(
+                    children: [
+                      TextFieldContainer(
+                          heading: "Heading",
+                          child: TextFormField(
+                            controller: Heading_ConvertorForTRCSRC_Controller,
+                            textInputAction: TextInputAction.next,
+                            style: TextStyle(color: Colors.black),
+                            decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: 'Heading',
+                                hintStyle: TextStyle(color: Colors.black)),
+                          )),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextFieldContainer(
+                                heading: "Path Name",
+                                child: TextFormField(
+                                  controller:
+                                      PathName_ConvertorForTRCSRC_Controller,
+                                  textInputAction: TextInputAction.next,
+                                  style: TextStyle(color: Colors.black),
+                                  decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: 'name',
+                                      hintStyle:
+                                          TextStyle(color: Colors.black)),
+                                )),
+                          ),
+                          Expanded(
+                            child: TextFieldContainer(
+                                heading: "Path Id",
+                                child: TextFormField(
+                                  controller:
+                                      PathId_ConvertorForTRCSRC_Controller,
+                                  textInputAction: TextInputAction.next,
+                                  style: TextStyle(color: Colors.black),
+                                  decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: 'Id',
+                                      hintStyle:
+                                          TextStyle(color: Colors.black)),
+                                )),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                              child: Uploader(
+                            type: FileType.any,
+                            path: "project",
+                            getIVF: (IVFData) {
+                              setState(() {
+                                IVF_appAndPlatforms = IVFData.first;
+                              });
+                            },
+                          )),
+                          InkWell(
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 5, horizontal: 10),
+                              decoration: BoxDecoration(
+                                color: Colors.black12,
+                                border: Border.all(color: Colors.white),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: Text(
+                                selectedConvertorForTRCSRC >= 0
+                                    ? "Save"
+                                    : "Add",
+                                style: TextStyle(fontSize: 20),
+                              ),
+                            ),
+                            onTap: () {
+                              setState(() {
+                                if (selectedConvertorForTRCSRC >= 0) {
+                                  appAndPlatforms[selectedConvertorForTRCSRC] =
+                                      ConvertorForTRCSRC(
+                                          heading:
+                                              Heading_ConvertorForTRCSRC_Controller
+                                                  .text,
+                                          path: Path(
+                                              path:
+                                                  PathName_ConvertorForTRCSRC_Controller
+                                                      .text,
+                                              id: PathId_ConvertorForTRCSRC_Controller
+                                                  .text),
+                                          IVF: IVF_appAndPlatforms != null
+                                              ? IVF_appAndPlatforms!
+                                              : IVFUploader(
+                                                  type: "",
+                                                  file_url: "",
+                                                  file_name: "",
+                                                  size: "",
+                                                  file_messageId: 0,
+                                                  thumbnail_url: "",
+                                                  thumbnail_messageId: 0));
+                                } else
+                                  appAndPlatforms.add(ConvertorForTRCSRC(
+                                      heading:
+                                          Heading_ConvertorForTRCSRC_Controller
+                                              .text,
+                                      path: Path(
+                                          path:
+                                              PathName_ConvertorForTRCSRC_Controller
+                                                  .text,
+                                          id: PathId_ConvertorForTRCSRC_Controller
+                                              .text),
+                                      IVF: IVF_appAndPlatforms != null
+                                          ? IVF_appAndPlatforms!
+                                          : IVFUploader(
+                                              type: "",
+                                              file_url: "",
+                                              file_name: "",
+                                              size: "",
+                                              file_messageId: 0,
+                                              thumbnail_url: "",
+                                              thumbnail_messageId: 0)));
+                                selectedConvertorForTRCSRC = -1;
+                                IVF_appAndPlatforms = IVFUploader(
+                                    type: "",
+                                    file_url: "",
+                                    file_name: "",
+                                    size: "",
+                                    file_messageId: 0,
+                                    thumbnail_url: "",
+                                    thumbnail_messageId: 0);
+                              });
+
+                              Heading_ConvertorForTRCSRC_Controller.clear();
+                              PathName_ConvertorForTRCSRC_Controller.clear();
+                              PathId_ConvertorForTRCSRC_Controller.clear();
+                            },
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Is Free ',
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      Switch(
+                        value: isFree,
+                        onChanged: (value) {
+                          setState(() {
+                            isFree = value;
+                          });
                         },
-                        child: Container(
+                        activeTrackColor: Colors.lightGreenAccent,
+                        activeColor: Colors.green,
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Is Contains Ads ',
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      Switch(
+                        value: isContainsAds,
+                        onChanged: (value) {
+                          setState(() {
+                            isContainsAds = value;
+                          });
+                        },
+                        activeTrackColor: Colors.lightGreenAccent,
+                        activeColor: Colors.green,
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+            Row(
+              children: [
+                Spacer(),
+                InkWell(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: Colors.white.withOpacity(0.5),
+                      border: Border.all(color: Colors.white),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 10, right: 10, top: 5, bottom: 5),
+                      child: Text("Back"),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                InkWell(
+                  onTap: () {
+                    String id = getID();
+                    createProject(
+                        displayHere:[],
+                        thumbnail:IVFUploader(
+                            type: "",
+                            file_url: "",
+                            file_name: "",
+                            size: "",
+                            file_messageId: 0,
+                            thumbnail_url: "",
+                            thumbnail_messageId: 0),
+                        isContainsAds: isContainsAds,
+                        isFree: isFree,
+                        id: widget.data == null ? id : widget.data!.id,
+                        type: TypeController.text,
+                        youtubeUrl: YoutubeLinkController.text,
+                        isUpdate: widget.data != null ? true : false,
+                        heading: HeadingConvertor(
+                            full: HeadingLastController.text,
+                            short: HeadingFirstController.text),
+                        about: DescriptionController.text,
+                        tags: TagsList,
+                        tableOfContent: tableOfContentList,
+                        componentsAndSupplies: ComponentsAndSupplies,
+                        appAndPlatforms: appAndPlatforms,
+                        toolsRequired: toolsRequired,
+                        description: descriptionList,
+                        images: iv);
+
+                    Navigator.pop(context);
+                  },
+                  child: widget.data == null
+                      ? Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(15),
                             color: Colors.white.withOpacity(0.5),
@@ -1082,448 +1185,118 @@ class _SensorsCreatorState extends State<SensorsCreator> {
                                 left: 10, right: 10, top: 5, bottom: 5),
                             child: Text("Create"),
                           ),
-                        )),
-                    SizedBox(
-                      width: 20,
+                        )
+                      : Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            color: Colors.white.withOpacity(0.5),
+                            border: Border.all(color: Colors.white),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                left: 10, right: 10, top: 5, bottom: 5),
+                            child: Text("Update"),
+                          ),
+                        ),
+                ),
+                SizedBox(
+                  width: 20,
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 100,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget convertorForTRCSRCContainer(
+      ConvertorForTRCSRC data, int mode, int index) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "${data.heading}",
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Text(
+                      "IVF : ${data.IVF.file_name}",
+                      style: TextStyle(fontSize: 10),
+                    ),
+                    Text(
+                      "Path : ${data.path.path}/${data.path.id}",
+                      style: TextStyle(fontSize: 10),
                     ),
                   ],
                 ),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class sensorsAndComponents extends StatefulWidget {
-  List<SensorsConverter> sensors;
-   sensorsAndComponents({required this.sensors});
-
-  @override
-  State<sensorsAndComponents> createState() => _sensorsAndComponentsState();
-}
-
-class _sensorsAndComponentsState extends State<sensorsAndComponents> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Padding(
-                padding: EdgeInsets.only(left: 15,top: 10),
-                child: Text(
-                  "Sensors",
-                  style: TextStyle( fontSize: 20,fontWeight: FontWeight.w500),
-                ),
               ),
-              ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: widget.sensors!.length,
-                shrinkWrap: true,
-                itemBuilder: (BuildContext context, int index) {
-                  final SubjectsData = widget.sensors[index];
-
-                  return InkWell(
-                    child: Container(
-                      margin:
-                      EdgeInsets.only(left: 15, right: 5, bottom: 2),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.08),
-                        borderRadius:
-                        BorderRadius.all(Radius.circular(15)),
-                      ),
-                      child: Row(
-                        children: [
-                          if(SubjectsData.images
-                              .first.isNotEmpty)Container(
-                            child: ImageShowAndDownload(
-                              image: SubjectsData.images
-                                  .first,
-                              id: SubjectsData.id,
-                            ),
-                            height: 70,
-                            width: 100,
-                          ),
-                          Expanded(
-                              child: Container(
-                                margin: EdgeInsets.symmetric(vertical: 2,horizontal: 10),
-                                padding: EdgeInsets.symmetric(vertical: 5,horizontal: 15),
-                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(20),color: Colors.black.withOpacity(0.08)),
-                                child: Text(
-                                  SubjectsData.heading.full,
-                                  style: TextStyle(
-                                    fontSize: 20, ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ))
-                        ],
-                      ),
-                    ),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          transitionDuration:
-                          const Duration(milliseconds: 300),
-                          pageBuilder: (context, animation,
-                              secondaryAnimation) =>
-                              sensor(data: SubjectsData,
-                              ),
-                          transitionsBuilder: (context, animation,
-                              secondaryAnimation, child) {
-                            final fadeTransition = FadeTransition(
-                              opacity: animation,
-                              child: child,
-                            );
-
-                            return Container(
-                              color: Colors.black
-                                  .withOpacity(animation.value),
-                              child: AnimatedOpacity(
-                                  duration:
-                                  Duration(milliseconds: 300),
-                                  opacity: animation.value
-                                      .clamp(0.3, 1.0),
-                                  child: fadeTransition),
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-
-              SizedBox(
-                height: 150,
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class sensor extends StatefulWidget {
-  SensorsConverter data;
-
-  sensor(
-      {Key? key,
-      required this.data})
-      : super(key: key);
-
-  @override
-  State<sensor> createState() => _sensorState();
-}
-
-class _sensorState extends State<sensor> {
-
-  CarouselController buttonCarouselController = CarouselController();
-  int currentPos = 0;
-
-  @override
-  void initState() {
-    super.initState();
-
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-        body: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
+            ),
+            Row(
               children: [
-                scrollingImages(
-                  images: widget.data.images,
-                  id: widget.data.id,
-                  isZoom: true,
-                ),
-                Padding(
-                  padding: EdgeInsets.only(left: 8,right: 8, top: 20),
-                  child: Column(
-                    children: [
-                      HeadingWithDivider(heading:"About Sensor" ,),
+                InkWell(
+                    onTap: () {
+                      setState(() {
+                        selectedConvertorForTRCSRC = index;
+                        if (mode == 2) {
+                          Heading_ConvertorForTRCSRC_Controller.text =
+                              appAndPlatforms[index].heading;
+                          PathName_ConvertorForTRCSRC_Controller.text =
+                              appAndPlatforms[index].path.path;
+                          ;
+                          PathId_ConvertorForTRCSRC_Controller.text =
+                              appAndPlatforms[index].path.id;
+                          ;
+                          IVF_appAndPlatforms = appAndPlatforms[index].IVF;
+                        }
+                      });
+                    },
+                    child: Icon(
+                      Icons.edit,
+                      color: Colors.black54,
+                    )),
+                InkWell(
+                    onTap: () {
+                      setState(() {
+                        if (mode == 2) {
 
-                      Padding(
-                        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                        child: Text(
-                          "          ${widget.data.about}",
-                          style: TextStyle( fontSize: 18),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 20),
-                  child: Column(
-                    children: [
-                      HeadingWithDivider(heading:"Technical Parameters" ,),
 
-
-                      Padding(
-                        padding:
-                        EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: Colors.black,
-                              borderRadius: BorderRadius.circular(15)),
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            itemCount: widget.data.technicalParameters
-                                .length, // Number of rows including the header
-                            itemBuilder: (context, index) {
-                              TableConvertor subTechnicalParameters =widget.data.technicalParameters[index];
-                              return Table(
-                                border: TableBorder.all(
-                                    width: 0.5,
-                                    color: Colors.white60,
-                                    borderRadius: index == 0
-                                        ? BorderRadius.only(
-                                        topLeft: Radius.circular(15),
-                                        topRight: Radius.circular(15))
-                                        : index == widget.data.technicalParameters.length - 1
-                                        ? BorderRadius.only(
-                                        bottomLeft: Radius.circular(15),
-                                        bottomRight: Radius.circular(15))
-                                        : BorderRadius.circular(0)),
-                                defaultVerticalAlignment:
-                                TableCellVerticalAlignment.middle,
-                                columnWidths: const {
-                                  0: FractionColumnWidth(0.4),
-                                  1: FractionColumnWidth(0.5),
-                                },
-                                children: [
-                                  TableRow(
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8)),
-                                    children: [
-                                      TableCell(
-                                        child: Padding(
-                                          padding: EdgeInsets.all(8.0),
-                                          child: Text(
-                                            textAlign: TextAlign.center,
-                                            subTechnicalParameters.col0,
-                                            style: TextStyle(color: Colors.white),
-                                          ),
-                                        ),
-                                      ),
-                                      TableCell(
-                                        child: Padding(
-                                          padding: EdgeInsets.all(8.0),
-                                          child: Text(
-                                              textAlign: TextAlign.center,
-                                              subTechnicalParameters.col1,
-                                              style:
-                                              TextStyle(color: Colors.white)),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                        ),
+                          deleteFileFromTelegramBot(appAndPlatforms[index].IVF.file_messageId);
+                          deleteFileFromTelegramBot(appAndPlatforms[index].IVF.thumbnail_messageId);
+                          appAndPlatforms.removeAt(index);
+                        }
+                      });
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Icon(
+                        Icons.delete,
+                        color: Colors.red,
                       ),
-                      if (widget.data.pinDiagrams.isNotEmpty)
-                        Padding(
-                          padding: EdgeInsets.symmetric(vertical: 20),
-                          child: Column(
-                            children: [
-                              HeadingWithDivider(heading:"Pin Connections" ,),
-                              Padding(
-                                padding: EdgeInsets.only(bottom: 20),
-                                child: Container(
-                                  height: 2,
-                                  width: 30,
-                                  decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(5)),
-                                ),
-                              ),
-                              scrollingImages(
-                                images: widget.data.pinDiagrams,
-                                id: widget.data.id,
-                                isZoom: true,
-                              ),
-                            ],
-                          ),
-                        ),
-                      Padding(
-                        padding:
-                        EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: Colors.black,
-                              borderRadius: BorderRadius.circular(15)),
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            itemCount: widget.data.pinConnections
-                                .length, // Number of rows including the header
-                            itemBuilder: (context, index) {
-                              TableConvertor subTechnicalParameters =
-                              widget.data.pinConnections[index];
-                              return Table(
-                                border: TableBorder.all(
-                                    width: 0.5,
-                                    color: Colors.white60,
-                                    borderRadius: index == 0
-                                        ? BorderRadius.only(
-                                        topLeft: Radius.circular(15),
-                                        topRight: Radius.circular(15))
-                                        : index == widget.data.pinConnections.length - 1
-                                        ? BorderRadius.only(
-                                        bottomLeft: Radius.circular(15),
-                                        bottomRight: Radius.circular(15))
-                                        : BorderRadius.circular(0)),
-                                defaultVerticalAlignment:
-                                TableCellVerticalAlignment.middle,
-                                columnWidths: const {
-                                  0: FractionColumnWidth(0.4),
-                                  1: FractionColumnWidth(0.5),
-                                },
-                                children: [
-                                  TableRow(
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8)),
-                                    children: [
-                                      TableCell(
-                                        child: Padding(
-                                          padding: EdgeInsets.all(8.0),
-                                          child: Text(
-                                            textAlign: TextAlign.center,
-                                            subTechnicalParameters.col0,
-                                            style: TextStyle(color: Colors.white),
-                                          ),
-                                        ),
-                                      ),
-                                      TableCell(
-                                        child: Padding(
-                                          padding: EdgeInsets.all(8.0),
-                                          child: Text(
-                                              textAlign: TextAlign.center,
-                                              subTechnicalParameters.col1,
-                                              style:
-                                              TextStyle(color: Colors.white)),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Description(
-                  id: '',
-                  data: [],
-                ),
-                SizedBox(
-                  height: 50,
-                )
+                    )),
               ],
             ),
-          ),
-        ));
-  }
-}
-class HeadingWithDivider extends StatelessWidget {
-  String heading;
-   HeadingWithDivider({required this.heading,super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(child: Divider()),
-        Center(
-          child: Text(
-            "  $heading  ",
-            style: TextStyle(
-                color: Colors.black,
-                fontSize: 20,
-                fontWeight: FontWeight.w500),
-          ),
+          ],
         ),
-        Expanded(child: Divider()),
       ],
     );
   }
 }
 
+class Point {
+  String name;
+  String score;
 
-class SensorsConverter {
-  final String id,type;
-  final HeadingConvertor heading;
-  final String about;
-  final List<TableConvertor> technicalParameters, pinConnections;
-  final List<String> images, pinDiagrams;
-  final List<DescriptionConvertor> descriptions;
-
-  SensorsConverter({
-    this.id = "",
-    required this.heading,
-    required this.type,
-    required this.images,
-    required this.descriptions,
-    required this.about,
-    required this.pinDiagrams,
-    required this.technicalParameters,
-    required this.pinConnections,
-  });
-
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'heading': heading.toJson(),
-    'images': images,
-    'type': type,
-    'descriptions': descriptions.map((desc) => desc.toJson()).toList(),
-    'about': about,
-    'pinDiagrams': pinDiagrams,
-    'technicalParameters':
-    technicalParameters.map((table) => table.toJson()).toList(),
-    'pinConnections':
-    pinConnections.map((table) => table.toJson()).toList(),
-  };
-
-  static SensorsConverter fromJson(Map<String, dynamic> json) => SensorsConverter(
-    id: json['id'] ?? "",
-    descriptions: DescriptionConvertor.fromMapList(json['descriptions'] ?? []),
-    heading: HeadingConvertor.fromJson(json["heading"]),
-    images: List<String>.from(json["images"]),
-    about: json["about"],
-    type: json["type"],
-    pinDiagrams: List<String>.from(json["pinDiagrams"]),
-    technicalParameters: TableConvertor.fromMapList(json['technicalParameters'] ?? []),
-    pinConnections: TableConvertor.fromMapList(json['pinConnections'] ?? []),
-  );
-
-  static List<SensorsConverter> fromMapList(List<dynamic> list) {
-    return list.map((item) => fromJson(item)).toList();
-  }
+  Point({required this.name, required this.score});
 }
-
-
-Stream<List<SensorsConverter>> readsensors() => FirebaseFirestore.instance
-    .collection('sensors')
-    .snapshots()
-    .map((snapshot) => snapshot.docs
-        .map((doc) => SensorsConverter.fromJson(doc.data()))
-        .toList());

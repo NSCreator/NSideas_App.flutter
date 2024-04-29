@@ -1,29 +1,23 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:nsideas/projects.dart';
+import 'package:nsideas/project_files/projects_test.dart';
+import 'package:nsideas/uploader/telegram_uploader.dart';
 
+import 'board/converter.dart';
 import 'functions.dart';
-import 'homePage.dart';
 
 class DescriptionCreator extends StatefulWidget {
   final String id;
+  final String mode;
 
-  String data;
-  String subData;
-  String images;
-  String table;
-  String files;
+  DescriptionConvertor? data;
 
   DescriptionCreator({
-    Key? key,
+    this.data,
     required this.id,
-    this.data = "",
-    this.subData = "",
-    this.images = "",
-    this.table = "",
-    this.files = "",
-  }) : super(key: key);
+    required this.mode,
+  });
 
   @override
   State<DescriptionCreator> createState() => _DescriptionCreatorState();
@@ -36,9 +30,7 @@ class _DescriptionCreatorState extends State<DescriptionCreator> {
 
   TextEditingController HeadingController = TextEditingController();
 
-  List<String> ImageList = [];
-  final TextEditingController _ImageController = TextEditingController();
-  int selectedImageIndex = -1;
+  List<IVFUploader> ImageList = [];
 
   @override
   void initState() {
@@ -47,11 +39,12 @@ class _DescriptionCreatorState extends State<DescriptionCreator> {
   }
 
   autoFill() {
-    if (widget.id.isNotEmpty) {
-      HeadingController.text = widget.data;
-      if (widget.subData.isNotEmpty) pointsList = widget.subData.split(";");
-      if (widget.images.isNotEmpty) ImageList = widget.images.split(";");
-      // if (widget.files.isNotEmpty) FilesList = widget.files;
+    if (widget.data != null) {
+      HeadingController.text = widget.data!.heading;
+      pointsList = widget.data!.points;
+      ImageList = widget.data!.IVF;
+      filesList = widget.data!.files;
+      tableList = widget.data!.table;
     }
   }
 
@@ -189,83 +182,28 @@ class _DescriptionCreatorState extends State<DescriptionCreator> {
     }
   }
 
-  void addImages() {
-    String points = _ImageController.text;
-    if (points.isNotEmpty) {
-      setState(() {
-        ImageList.add(points);
-        _ImageController.clear();
-      });
-    }
-  }
-
-  void editImages(int index) {
-    setState(() {
-      selectedImageIndex = index;
-      _ImageController.text = ImageList[index];
-    });
-  }
-
-  void saveImages() {
-    String editedImage = _ImageController.text;
-    if (editedImage.isNotEmpty && selectedImageIndex != -1) {
-      setState(() {
-        ImageList[selectedImageIndex] = editedImage;
-        _ImageController.clear();
-        selectedImageIndex = -1;
-      });
-    }
-  }
-
-  void deleteImages(int index) {
-    setState(() {
-      ImageList.removeAt(index);
-      if (selectedImageIndex == index) {
-        selectedImageIndex = -1;
-        _ImageController.clear();
-      }
-    });
-  }
-
-  void moveImagesUp(int index) {
-    if (index > 0) {
-      setState(() {
-        String point = ImageList.removeAt(index);
-        ImageList.insert(index - 1, point);
-        if (selectedImageIndex == index) {
-          selectedImageIndex--;
-        }
-      });
-    }
-  }
-
-  void moveImagesDown(int index) {
-    if (index < ImageList.length - 1) {
-      setState(() {
-        String Image = ImageList.removeAt(index);
-        ImageList.insert(index + 1, Image);
-        if (selectedImageIndex == index) {
-          selectedImageIndex++;
-        }
-      });
-    }
-  }
-
   List<CodeFilesConvertor> filesList = [];
   final TextEditingController _HeadingFilesController = TextEditingController();
-  final TextEditingController _DataFilesController = TextEditingController();
-  final TextEditingController _TypeFilesController = TextEditingController();
+  final TextEditingController _CodeController = TextEditingController();
+  final TextEditingController _CodeLangController = TextEditingController();
   int selectedFilesIndex = -1;
 
   void addFiles() {
     setState(() {
       filesList.add(CodeFilesConvertor(
           heading: _HeadingFilesController.text,
-          data: _DataFilesController.text,
-          type: _TypeFilesController.text));
+          code: _CodeController.text,
+          lang: _CodeLangController.text,
+          IVF: IVFUploader(
+              type: "",
+              file_url: "",
+              size: "",
+              file_messageId: 0,
+              thumbnail_url: "",
+              thumbnail_messageId: 0, file_name: '')));
       _HeadingFilesController.clear();
-      _DataFilesController.clear();
-      _TypeFilesController.clear();
+      _CodeController.clear();
+      _CodeLangController.clear();
     });
   }
 
@@ -273,26 +211,26 @@ class _DescriptionCreatorState extends State<DescriptionCreator> {
     setState(() {
       selectedFilesIndex = index;
       _HeadingFilesController.text = filesList[index].heading;
-      _DataFilesController.text = filesList[index].data;
-      _TypeFilesController.text = filesList[index].type;
+      _CodeController.text = filesList[index].code;
+      _CodeLangController.text = filesList[index].lang;
     });
   }
 
   void saveFiles() {
     String editedHeadingFiles = _HeadingFilesController.text;
-    String editedDataFiles = _DataFilesController.text;
-    String editedTypeFiles = _TypeFilesController.text;
+    String editedDataFiles = _CodeController.text;
+    String editedTypeFiles = _CodeLangController.text;
     if (editedHeadingFiles.isNotEmpty &&
         editedDataFiles.isNotEmpty &&
         editedTypeFiles.isNotEmpty &&
         selectedFilesIndex != -1) {
       setState(() {
         filesList[selectedFilesIndex].heading = editedHeadingFiles;
-        filesList[selectedFilesIndex].data = editedDataFiles;
-        filesList[selectedFilesIndex].type = editedTypeFiles;
+        filesList[selectedFilesIndex].code = editedDataFiles;
+        filesList[selectedFilesIndex].lang = editedTypeFiles;
         _HeadingFilesController.clear();
-        _DataFilesController.clear();
-        _TypeFilesController.clear();
+        _CodeController.clear();
+        _CodeLangController.clear();
         selectedFilesIndex = -1;
       });
     }
@@ -340,31 +278,7 @@ class _DescriptionCreatorState extends State<DescriptionCreator> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              InkWell(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Wrap(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(left: 10, right: 5),
-                      child: Icon(
-                        Icons.arrow_back,
-                        size: 20,
-                        color: Colors.black,
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        "Back",
-                        style: TextStyle(fontSize: 16, color: Colors.black),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              backButton(),
               TextFieldContainer(
                   heading: "Heading",
                   child: TextFormField(
@@ -701,98 +615,14 @@ class _DescriptionCreatorState extends State<DescriptionCreator> {
                       color: Colors.black),
                 ),
               ),
-              ListView.builder(
-                itemCount: ImageList.length,
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemBuilder: (context, index) {
-                  return Dismissible(
-                    key: Key(ImageList[index]),
-                    background: Container(
-                      color: Colors.red,
-                      alignment: Alignment.centerRight,
-                      padding: EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Icon(
-                        Icons.delete,
-                        color: Colors.white,
-                      ),
-                    ),
-                    direction: DismissDirection.endToStart,
-                    onDismissed: (direction) {
-                      deleteImages(index);
-                    },
-                    child: ListTile(
-                      title: Text(ImageList[index]),
-                      trailing: SingleChildScrollView(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            IconButton(
-                              icon: Icon(Icons.delete),
-                              onPressed: () {
-                                deleteImages(index);
-                              },
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.edit),
-                              onPressed: () {
-                                editImages(index);
-                              },
-                            ),
-                            InkWell(
-                              child: Icon(
-                                Icons.move_up,
-                                size: 30,
-                              ),
-                              onTap: () {
-                                moveImagesUp(index);
-                              },
-                              onDoubleTap: () {
-                                moveImagesDown(index);
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      onTap: () {
-                        editImages(index);
-                      },
-                    ),
-                  );
+              Uploader(
+                ivf: ImageList,
+                getIVF: (imageData) {
+                  ImageList = imageData;
                 },
-              ),
-              Row(
-                children: [
-                  Flexible(
-                    child: TextFieldContainer(
-                        heading: "Images",
-                        child: TextFormField(
-                          controller: _ImageController,
-                          textInputAction: TextInputAction.next,
-                          style: TextStyle(color: Colors.black),
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Images',
-                              hintStyle: TextStyle(color: Colors.black)),
-                        )),
-                  ),
-                  InkWell(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white12,
-                        border: Border.all(color: Colors.white),
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Icon(
-                        Icons.add,
-                        size: 45,
-                      ),
-                    ),
-                    onTap: () {
-                      addImages();
-                    },
-                  )
-                ],
+                type: FileType.image,
+                path: "description",
+                allowMultiple: true,
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 15, top: 8),
@@ -810,7 +640,7 @@ class _DescriptionCreatorState extends State<DescriptionCreator> {
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
                   return Dismissible(
-                    key: Key(filesList[index].data),
+                    key: Key(filesList[index].code),
                     background: Container(
                       color: Colors.red,
                       alignment: Alignment.centerRight,
@@ -822,12 +652,12 @@ class _DescriptionCreatorState extends State<DescriptionCreator> {
                     ),
                     direction: DismissDirection.endToStart,
                     onDismissed: (direction) {
-                      deleteImages(index);
+                      // deleteImages(index);
                     },
                     child: ListTile(
-                      leading: Text(filesList[index].type),
+                      leading: Text(filesList[index].lang),
                       title: Text(filesList[index].heading),
-                      subtitle: Text(filesList[index].data),
+                      subtitle: Text(filesList[index].code),
                       trailing: SingleChildScrollView(
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -889,7 +719,7 @@ class _DescriptionCreatorState extends State<DescriptionCreator> {
                         child: TextFieldContainer(
                             heading: "Type",
                             child: TextFormField(
-                              controller: _TypeFilesController,
+                              controller: _CodeLangController,
                               textInputAction: TextInputAction.next,
                               style: TextStyle(color: Colors.black),
                               decoration: InputDecoration(
@@ -906,7 +736,7 @@ class _DescriptionCreatorState extends State<DescriptionCreator> {
                         child: TextFieldContainer(
                             heading: "Data",
                             child: TextFormField(
-                              controller: _DataFilesController,
+                              controller: _CodeController,
                               textInputAction: TextInputAction.next,
                               style: TextStyle(color: Colors.black),
                               maxLines: null,
@@ -964,15 +794,14 @@ class _DescriptionCreatorState extends State<DescriptionCreator> {
                     InkWell(
                         onTap: () async {
                           await FirebaseFirestore.instance
-                             
-                              .collection("boards")
+                              .collection(widget.mode)
                               .doc(widget.id)
                               .update({
                             'descriptions': FieldValue.arrayUnion([
                               DescriptionConvertor(
                                 heading: HeadingController.text,
                                 points: pointsList,
-                                images: ImageList,
+                                IVF: ImageList,
                                 files: filesList,
                                 table: tableList,
                               ).toJson(),
@@ -1031,210 +860,32 @@ class TableConvertor {
 }
 
 class CodeFilesConvertor {
-  String heading, type;
-  String data;
+  String heading, lang;
+  String code;
+  final IVFUploader IVF;
 
   CodeFilesConvertor(
-      {required this.heading, required this.data, required this.type});
+      {required this.heading,
+      required this.code,
+      required this.IVF,
+      required this.lang});
 
   Map<String, dynamic> toJson() => {
         "heading": heading,
-        "data": data,
-        "type": type,
+        "code": code,
+        "lang": lang,
+        "IVF": IVF.toJson(),
       };
 
   static CodeFilesConvertor fromJson(Map<String, dynamic> json) =>
       CodeFilesConvertor(
         heading: json['heading'] ?? "",
-        data: json["data"] ?? "",
-        type: json["type"] ?? "",
+        code: json["code"] ?? "",
+        lang: json["lang"] ?? "",
+        IVF: IVFUploader.fromJson(json["IVF"] ?? {}),
       );
 
   static List<CodeFilesConvertor> fromMapList(List<dynamic> list) {
     return list.map((item) => fromJson(item)).toList();
-  }
-}
-
-class arduinoBoardCreator extends StatefulWidget {
-  arduinoBoardCreator({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  State<arduinoBoardCreator> createState() => _arduinoBoardCreatorState();
-}
-
-class _arduinoBoardCreatorState extends State<arduinoBoardCreator> {
-  final shortController = TextEditingController();
-  final fullController = TextEditingController();
-  final AboutController = TextEditingController();
-  final PhotoUrl = TextEditingController();
-  final CircuitDiagram = TextEditingController();
-  final TypeController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    shortController.dispose();
-    AboutController.dispose();
-    PhotoUrl.dispose();
-    CircuitDiagram.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            backButton(
-              text: "Arduino Board",
-            ),
-            TextFieldContainer(
-              heading: "Short Heading",
-              child: TextFormField(
-                controller: shortController,
-                textInputAction: TextInputAction.next,
-                style: TextStyle(color: Colors.black, fontSize: 20),
-                decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintText: 'Short',
-                    hintStyle: TextStyle(color: Colors.black54)),
-              ),
-            ),
-            TextFieldContainer(
-              heading: "Full Heading",
-              child: TextFormField(
-                controller: fullController,
-                textInputAction: TextInputAction.next,
-                style: TextStyle(color: Colors.black, fontSize: 20),
-                decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintText: 'Full',
-                    hintStyle: TextStyle(color: Colors.black54)),
-              ),
-            ),
-            TextFieldContainer(
-              heading: "Description",
-              child: TextFormField(
-                controller: AboutController,
-                textInputAction: TextInputAction.next,
-                style: TextStyle(color: Colors.black, fontSize: 20),
-                decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintText: 'Description',
-                    hintStyle: TextStyle(color: Colors.black54)),
-              ),
-            ),
-            TextFieldContainer(
-              heading: "Images",
-              child: TextFormField(
-                controller: PhotoUrl,
-                textInputAction: TextInputAction.next,
-                style: TextStyle(color: Colors.black, fontSize: 20),
-                decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintText: 'Images',
-                    hintStyle: TextStyle(color: Colors.black54)),
-              ),
-            ),
-            TextFieldContainer(
-              heading: "Board Pin Out ",
-              child: TextFormField(
-                controller: CircuitDiagram,
-                textInputAction: TextInputAction.next,
-                style: TextStyle(color: Colors.black, fontSize: 20),
-                decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintText: 'Pin Out',
-                    hintStyle: TextStyle(color: Colors.black54)),
-              ),
-            ),
-            TextFieldContainer(
-              heading: "Board Type",
-              child: TextFormField(
-                controller: TypeController,
-                textInputAction: TextInputAction.next,
-                style: TextStyle(color: Colors.black, fontSize: 20),
-                decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintText: 'Enter Type Here',
-                    hintStyle: TextStyle(color: Colors.black54)),
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Row(
-              children: [
-                const Spacer(),
-                InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: Colors.white.withOpacity(0.5),
-                      border: Border.all(color: Colors.white),
-                    ),
-                    child: const Padding(
-                      padding: EdgeInsets.only(
-                          left: 10, right: 10, top: 5, bottom: 5),
-                      child: Text("Back"),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                InkWell(
-                    onTap: () async {
-                      String id = getID();
-                      await FirebaseFirestore.instance
-
-                          .collection("boards")
-                          .doc(id)
-                          .set(BoardsConvertor(
-                        id: id,
-                        heading: HeadingConvertor(
-                          full: fullController.text,
-                          short: shortController.text,
-                        ),
-                        images: [PhotoUrl.text],
-                        about: AboutController.text,
-                        type: TypeController.text,
-                        pinDiagrams: [CircuitDiagram.text], descriptions: [],
-                      ).toJson());
-                      Navigator.pop(context);
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        color: Colors.white.withOpacity(0.5),
-                        border: Border.all(color: Colors.white),
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.only(
-                            left: 10, right: 10, top: 5, bottom: 5),
-                        child: Text("Create"),
-                      ),
-                    )),
-                const SizedBox(
-                  width: 20,
-                ),
-              ],
-            )
-          ],
-        ),
-      ),
-    );
   }
 }
