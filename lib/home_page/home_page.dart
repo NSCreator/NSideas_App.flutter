@@ -21,7 +21,6 @@ import 'package:nsideas/project_files/projects_test.dart';
 import 'package:nsideas/home_page/searchBar.dart';
 import 'package:nsideas/sensors/converter.dart';
 import 'package:nsideas/sensors/sensor_components.dart';
-
 import 'package:nsideas/sensors/sub_page.dart';
 import 'package:nsideas/settings/settings.dart';
 import 'package:nsideas/shopping/Converter.dart';
