@@ -130,7 +130,7 @@ class _HomePageState extends State<HomePage> {
             SafeArea(
               bottom: false,
               child: Padding(
-                padding: const EdgeInsets.only(left: 10.0,right: 10,top: 5),
+                padding: const EdgeInsets.only(left: 10.0,right: 20,top: 5),
                 child: Row(
                   children: [
                     InkWell(
@@ -150,6 +150,64 @@ class _HomePageState extends State<HomePage> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
+                                    builder: (context) => searchBar(
+                                      projects: widget.projects,
+                                    )));
+                          },
+                          child: Icon(
+                            Icons.search,
+                            color: Colors.white70,
+                            size: 30,
+                          ),
+                        ),
+                        SizedBox(width: 10,),
+
+                        InkWell(
+                          onTap: () {
+                            if (!isAnonymousUser()){
+                              if (isOwner()) {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => notifications()));
+                              } else {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => notification(email: "",)));
+                              }
+                            }else{
+                              showToastText("Please LogIn");
+                            }
+
+                          },
+                          child: Icon(
+                            Icons.message_outlined,
+                            color: Colors.white60,
+                            size: 30,
+                          ),
+                        ),
+                        SizedBox(width: 10,),
+
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => favorites()));
+                          },
+                          child: Icon(
+                            Icons.favorite_border,
+                            color: Colors.white70,
+                            size: 30,
+                          ),
+                        ),
+                        SizedBox(width: 10,),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
                                     builder: (context) => NotificationPage(
                                           notification: widget.notification,
                                         )));
@@ -162,7 +220,7 @@ class _HomePageState extends State<HomePage> {
                             child: Icon(
                               Icons.notifications_none,
                               color: Colors.white70,
-                              size: 25,
+                              size: 30,
                             ),
                           ),
                         ),
@@ -178,113 +236,10 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: InkWell(
-                        onTap: () async {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => searchBar(
-                                        projects: widget.projects,
-                                      )));
-                        },
-                        child: Container(
-                          margin:
-                              EdgeInsets.only(top: 10, bottom: 10, left: 10),
-                          decoration: BoxDecoration(
-                            color: Colors.blueGrey.shade900,
-                            border: Border.all(
-                                color: Colors.black.withOpacity(0.05)),
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          child: Row(
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 5),
-                                child: Icon(
-                                  Icons.search,
-                                  color: Colors.white54,
-                                  size: 35,
-                                ),
-                              ),
-                              Expanded(
-                                child: Text(
-                                  "Search Here --- Testing ---",
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.white.withOpacity(0.6)),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-
-                      InkWell(
-                        onTap: () {
-                          if (!isAnonymousUser()){
-                            if (isOwner()) {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => notifications()));
-                            } else {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => notification(email: "",)));
-                            }
-                          }else{
-                            showToastText("Please LogIn");
-                          }
-
-                        },
-                        child: Container(
-                          margin: EdgeInsets.only(
-                            left: 8,
-                          ),
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.blueGrey.shade900,
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          child: Icon(
-                            Icons.message,
-                            color: Colors.white60,
-                            size: 30,
-                          ),
-                        ),
-                      ),
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => favorites()));
-                      },
-                      child: Container(
-                        margin: EdgeInsets.only(left: 8, right: 10),
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.blueGrey.shade900,
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Icon(
-                          Icons.favorite,
-                          color: Colors.white60,
-                          size: 30,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                SizedBox(height: 10,),
                 HeadingH2(heading: "Categories"),
                 SizedBox(
-                  height: 40,
+                  height: 50,
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
@@ -421,6 +376,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
+                SizedBox(height: 30,),
                 if (widget.HomePageImages.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.all(8.0),

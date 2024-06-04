@@ -236,12 +236,14 @@ class _MyHomePageState extends State<MyHomePage> {
       return false; // Indicate error
     }
   }
-
-  listenToNotifications() {
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  listenToNotifications() async {
+    await _firebaseMessaging.subscribeToTopic('home');
     print("Listening to notification");
     LocalNotifications.onClickNotification.stream.listen((payload) {
       print("Notification payload: $payload");
       var someData = jsonDecode(payload);
+      print("object");
       if (someData['navigation'] == 'message') {
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => notifications()));
@@ -262,7 +264,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
     if (projects != null) {
       return Scaffold(
         body: Stack(
@@ -277,33 +278,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 products: products,
                 HomePageImages: HomePageImages,
               ),
-              HomePage(
-                apps: apps,
-                projects: projects,
-                boards: boards,
-                sensors: sensors,
-                notification: notification,
-                products: products,
-                HomePageImages: HomePageImages,
-              ),
-              HomePage(
-                apps: apps,
-                projects: projects,
-                boards: boards,
-                sensors: sensors,
-                notification: notification,
-                products: products,
-                HomePageImages: HomePageImages,
-              ),
-              HomePage(
-                apps: apps,
-                projects: projects,
-                boards: boards,
-                sensors: sensors,
-                notification: notification,
-                products: products,
-                HomePageImages: HomePageImages,
-              ),
+
               settings()
             ][currentPageIndex],
             Positioned(
@@ -320,10 +295,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           bottomIcon(index: 0, text: 'Home', icon: Icons.home_filled),
-                          bottomIcon(index: 0, text: 'Home', icon: Icons.home_filled),
-                          bottomIcon(index: 0, text: 'Home', icon: Icons.home_filled),
-                          bottomIcon(index: 0, text: 'Home', icon: Icons.home_filled),
-                          bottomIcon(index: 4, text: 'Settings', icon: Icons.manage_accounts),
+
+                          bottomIcon(index: 1, text: 'Settings', icon: Icons.manage_accounts),
                         ],
                       ),
                     ),

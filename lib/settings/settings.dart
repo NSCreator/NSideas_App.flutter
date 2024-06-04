@@ -117,7 +117,7 @@ class _settingsState extends State<settings> {
                       child: auth.currentUser?.photoURL != null
                           ? Image.network(
                         auth.currentUser?.photoURL ?? "",
-                        fit: BoxFit.cover,
+                        fit: BoxFit.fill,
                       )
                           : Icon(
                         Icons.person,
