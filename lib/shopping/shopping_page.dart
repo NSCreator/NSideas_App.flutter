@@ -15,7 +15,7 @@ import 'cart.dart';
 import 'sub_page.dart';
 
 TextStyle HeadingTextStyle =
-    TextStyle(fontSize: 25, fontWeight: FontWeight.w500);
+    TextStyle(fontSize: 25, fontWeight: FontWeight.w500,color: Colors.white);
 
 class ShoppingPage extends StatefulWidget {
   List<ProductsConverter> products;
@@ -37,13 +37,9 @@ class _ShoppingPageState extends State<ShoppingPage> {
           backButton(),
           Row(
             children: [
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
-                child: Text("Shopping", style: HeadingTextStyle),
-              ),
+              HeadingH1(heading: "Shopping"),
               Spacer(),
-              InkWell(
+              if (!isAnonymousUser()) InkWell(
                   onTap: () {
                     Navigator.push(context, MaterialPageRoute(builder: (context)=>CartPage()));
                   },
@@ -51,6 +47,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 15.0),
                     child: Icon(
                       Icons.shopping_cart,
+                      color: Colors.white70,
                       size: 30,
                     ),
                   ))
@@ -168,13 +165,13 @@ class _ShoppingPageState extends State<ShoppingPage> {
               padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
               margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
               decoration: BoxDecoration(
-                  color: Colors.white, borderRadius: BorderRadius.circular(10)),
+                  color: Colors.white10, borderRadius: BorderRadius.circular(10)),
               child: Row(
                 children: [
-                  Icon(Icons.shopping_bag),
+                  Icon(Icons.shopping_bag,color: Colors.white70,),
                   Text(
                     " Unavailable Products",
-                    style: TextStyle(fontSize: 20),
+                    style: TextStyle(fontSize: 20,color: Colors.white),
                   )
                 ],
               ),

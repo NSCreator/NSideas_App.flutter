@@ -3,7 +3,10 @@ import 'package:nsideas/functions.dart';
 import 'package:nsideas/project_files/converter.dart';
 import 'package:nsideas/project_files/sub_page.dart';
 import 'package:nsideas/project_files/projects_test.dart';
+import 'package:nsideas/test.dart';
 
+import '../ads/ads.dart';
+import '../home_page/home_page.dart';
 import '../shopping/Converter.dart';
 import '../shopping/sub_page.dart';
 import 'converter.dart';
@@ -44,18 +47,12 @@ class _favoritesState extends State<favorites> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             backButton(),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0),
-              child: Text(
-                "Favorites",
-                style: TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
-              ),
-            ),
+            HeadingH1(heading: "Favorites"),
             if(products.isNotEmpty)Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
               child: Text(
                 "Products",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500,color: Colors.white),
               ),
             ),
             ListView.builder(
@@ -152,7 +149,7 @@ class _favoritesState extends State<favorites> {
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
               child: Text(
                 "Projects",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500,color: Colors.white),
               ),
             ),
             ListView.builder(
@@ -160,20 +157,55 @@ class _favoritesState extends State<favorites> {
                 itemCount: projects.length,
                 itemBuilder: (context, int index) {
                   final data = projects[index];
+                  bool _isTapped = false;
                   return InkWell(
-                    onTap: () {
-                      Navigator.push(
+                    onTap: () async {
+                      if (isOwner()) {
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => Project(
-                                    data: data,
-                                  )));
+                            builder: (context) => Project(data: data),
+                          ),
+                        );
+                        showToastText("Owner Mode");
+                      } else if (!_isTapped) {
+                        _isTapped = true;
+                        Future.delayed(Duration(seconds: 2), () {
+                          _isTapped = false;
+                        });
+                        if (!data.isFree) {
+                          showToastText("Buying Option: Coming Soon");
+                        } else if (data.isContainsAds && data.isFree) {
+                          bool ad = await HomePageAd(context, type: data.id)
+                              .startAdLoading();
+
+                          if (ad) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Project(data: data),
+                              ),
+                            );
+                          } else {
+                            showToastText("Error with Ad, Please Message Owner");
+                          }
+                        } else {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Project(data: data),
+                            ),
+                          );
+                        }
+
+
+                      }
                     },
                     child: Container(
                       margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                       padding: EdgeInsets.all(5),
                       decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Colors.white10,
                           borderRadius: BorderRadius.circular(15)),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -181,15 +213,10 @@ class _favoritesState extends State<favorites> {
                         children: [
                           AspectRatio(
                               aspectRatio: 16 / 6,
-                              child: data.images.isNotEmpty?ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: Image.network(
-                                    data.images.first.file_url,
-                                    fit: BoxFit.cover,
-                                  )):null),
+                              child: ImageShowAndDownload(image: data.thumbnail.fileUrl,id: "project",)),
                           Text(
                             data.heading.full,
-                            style: TextStyle(fontSize: 22),
+                            style: TextStyle(fontSize: 22,color: Colors.white),
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
@@ -204,13 +231,13 @@ class _favoritesState extends State<favorites> {
                                       padding: EdgeInsets.symmetric(
                                           vertical: 2, horizontal: 10),
                                       decoration: BoxDecoration(
-                                          color: Colors.red,
+                                          color: Colors.orangeAccent,
                                           borderRadius:
                                               BorderRadius.circular(8)),
                                       child: Text(
                                         "Remove",
                                         style: TextStyle(
-                                            fontWeight: FontWeight.w500,
+                                            fontWeight: FontWeight.bold,
                                             color: Colors.white),
                                       )))
                             ],
@@ -222,7 +249,7 @@ class _favoritesState extends State<favorites> {
                 }),
             if(products.isEmpty&&projects.isEmpty)Center(child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 20.0),
-              child: Text("Empty",style: TextStyle(fontSize: 25),),
+              child: Text("Empty",style: TextStyle(fontSize: 20,color: Colors.white70),),
             ))
           ],
         ),

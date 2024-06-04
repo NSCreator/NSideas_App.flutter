@@ -40,16 +40,11 @@ class _NotificationCreatorState extends State<NotificationCreator> {
             children: [
               backButton(),
               TextFieldContainer(
+                  controller: HeadingController,
+                  hintText: 'short',
+
                   heading: "Heading",
-                  child: TextFormField(
-                    controller: HeadingController,
-                    textInputAction: TextInputAction.next,
-                    style: TextStyle(color: Colors.black),
-                    decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: 'short',
-                        hintStyle: TextStyle(color: Colors.black)),
-                  )),
+                  ),
               // Uploader(
               //   onChanged: (value) {
               //
@@ -63,26 +58,14 @@ class _NotificationCreatorState extends State<NotificationCreator> {
 
               TextFieldContainer(
                   heading: "Youtube Url",
-                  child: TextFormField(
-                    controller: YoutubeController,
-                    textInputAction: TextInputAction.next,
-                    style: TextStyle(color: Colors.black),
-                    decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: 'short',
-                        hintStyle: TextStyle(color: Colors.black)),
-                  )),
+                  hintText: 'short',
+                  controller: YoutubeController,
+                ),
               TextFieldContainer(
                   heading: "Description",
-                  child: TextFormField(
-                    controller: DescriptionController,
-                    textInputAction: TextInputAction.next,
-                    style: TextStyle(color: Colors.black),
-                    decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: 'short',
-                        hintStyle: TextStyle(color: Colors.black)),
-                  )),
+                  controller: DescriptionController,
+                  hintText: 'short',
+              ),
               Padding(
                 padding: EdgeInsets.all(15.0),
                 child: Row(
@@ -113,7 +96,7 @@ class _NotificationCreatorState extends State<NotificationCreator> {
                           String id = getID();
                           await FirebaseFirestore.instance
                               .collection('notifications')
-                              .doc(id)
+                              .doc()
                               .set(NotificationConverter(
                                       id: id,
                                       heading: HeadingController.text.trim(),

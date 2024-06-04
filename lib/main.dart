@@ -1,9 +1,11 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nsideas/project_files/projects.dart';
@@ -13,6 +15,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:nsideas/shopping/all_orders.dart';
 import 'package:nsideas/shopping/cart.dart';
 import 'package:nsideas/shopping/shopping_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'dart:convert';
 import 'apps/convertor.dart';
 import 'auth/logIn_page.dart';
@@ -89,26 +93,32 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'NS Ideas',
-      theme: ThemeData(
-          useMaterial3: true,
-          highlightColor: Colors.transparent,
-          splashColor: Colors.transparent,
-          textTheme: GoogleFonts.muktaTextTheme(),
-          splashFactory: NoSplash.splashFactory,
-          scaffoldBackgroundColor: Colors.white),
-      home: StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return MyHomePage();
-          } else {
-            return LoginPage();
-          }
-        },
+    final MediaQueryData data = MediaQuery.of(context);
+    return MediaQuery(
+      data: data.copyWith(
+          textScaleFactor:
+              data.textScaleFactor > 1.1 ? 1.1 : data.textScaleFactor),
+      child: MaterialApp(
+        title: 'NS Ideas',
+        theme: ThemeData(
+            useMaterial3: true,
+            highlightColor: Colors.transparent,
+            splashColor: Colors.transparent,
+            textTheme: GoogleFonts.muktaTextTheme(),
+            splashFactory: NoSplash.splashFactory,
+            scaffoldBackgroundColor: Color.fromARGB(255, 27, 32, 35)),
+        home: StreamBuilder<User?>(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return MyHomePage();
+            } else {
+              return LoginPage();
+            }
+          },
+        ),
+        debugShowCheckedModeBanner: false,
       ),
-      debugShowCheckedModeBanner: false,
     );
   }
 }
@@ -119,17 +129,15 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _selectedIndex = 0;
   List<ProjectConverter> projects = [];
   List<BoardsConverter> boards = [];
   List<SensorsConverter> sensors = [];
   List<NotificationConverter> notification = [];
   List<ProductsConverter> products = [];
   List<HomePageImagesConvertor> HomePageImages = [];
-  List<AppsConvertor> apps =[];
-  late PageController _pageController;
+  List<AppsConverter> apps = [];
 
-  Future<dynamic> getDat(bool isReload) async {
+  Future<dynamic> getData(bool isReload) async {
     projects = await getProjects(isReload);
     apps = await getApps(isReload);
     notification = await getNotification(isReload);
@@ -152,26 +160,81 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    getDat(true);
+    isUpdated();
     listenToNotifications();
-    _pageController = PageController(initialPage: _selectedIndex);
   }
 
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
+  void showUpdateDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return dialog
+        return AlertDialog(
+          backgroundColor: Colors.blueGrey.shade900,
+          title: Text('Update Available',
+              style: TextStyle(
+                color: Colors.white,
+              )),
+          content: Text(
+              'A new update for this app is available on the Play Store. Please update to enjoy the latest features and improvements.',
+              style: TextStyle(
+                color: Colors.white70,
+              )),
+          actions: [
+            TextButton(
+              onPressed: () {
+                launch(
+                    'https://play.google.com/store/apps/details?id=com.nimmalasujith.esrkr');
+              },
+              child: Text('Open Play Store',
+                  style: TextStyle(color: Colors.greenAccent, fontSize: 20)),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Cancel',
+                  style: TextStyle(color: Colors.white70, fontSize: 15)),
+            ),
+          ],
+        );
+      },
+    );
   }
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-      _pageController.animateToPage(
-        index,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.ease,
-      );
-    });
+  Future<bool> isUpdated() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final localUpdatedAt = prefs.getString('Updated');
+      Future<DataSnapshot> fetchData() async {
+        final databaseReference =
+            await FirebaseDatabase.instance.ref("Updated").once();
+        return databaseReference.snapshot;
+      }
+
+      final data = await fetchData();
+
+      List<String> value = data.value.toString().split(",");
+      if (value.first != version) {
+        showUpdateDialog(context);
+      }
+      if (localUpdatedAt != value.last) {
+        showToastText("Data Updating");
+        await getData(true);
+        await prefs.setString('Updated', value.last);
+        return true; // Data has been updated
+      } else {
+        getData(false);
+        return false;
+      }
+    } on PlatformException catch (error) {
+      print('PlatformException: $error');
+      showToastText('Error checking for updates: $error');
+      return false; // Indicate error
+    } catch (error) {
+      await getData(true);
+      print('Error: $error');
+      showToastText('An error occurred: $error');
+      return false; // Indicate error
+    }
   }
 
   listenToNotifications() {
@@ -199,14 +262,106 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return   HomePage(
-      apps: apps,
-      projects: projects,
-      boards: boards,
-      sensors: sensors,
-      notification: notification,
-      products: products,
-      HomePageImages: HomePageImages,
+    final ThemeData theme = Theme.of(context);
+    if (projects != null) {
+      return Scaffold(
+        body: Stack(
+          children: [
+            <Widget>[
+              HomePage(
+                apps: apps,
+                projects: projects,
+                boards: boards,
+                sensors: sensors,
+                notification: notification,
+                products: products,
+                HomePageImages: HomePageImages,
+              ),
+              HomePage(
+                apps: apps,
+                projects: projects,
+                boards: boards,
+                sensors: sensors,
+                notification: notification,
+                products: products,
+                HomePageImages: HomePageImages,
+              ),
+              HomePage(
+                apps: apps,
+                projects: projects,
+                boards: boards,
+                sensors: sensors,
+                notification: notification,
+                products: products,
+                HomePageImages: HomePageImages,
+              ),
+              HomePage(
+                apps: apps,
+                projects: projects,
+                boards: boards,
+                sensors: sensors,
+                notification: notification,
+                products: products,
+                HomePageImages: HomePageImages,
+              ),
+              settings()
+            ][currentPageIndex],
+            Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: Container(
+                  color: Colors.blueGrey.shade900,
+                  child: SafeArea(
+                    top: false,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 5.0,right: 5,top: 3),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          bottomIcon(index: 0, text: 'Home', icon: Icons.home_filled),
+                          bottomIcon(index: 0, text: 'Home', icon: Icons.home_filled),
+                          bottomIcon(index: 0, text: 'Home', icon: Icons.home_filled),
+                          bottomIcon(index: 0, text: 'Home', icon: Icons.home_filled),
+                          bottomIcon(index: 4, text: 'Settings', icon: Icons.manage_accounts),
+                        ],
+                      ),
+                    ),
+                  ),
+                ))
+          ],
+        ),
+      );
+    } else {
+      return Center(
+        child: CircularProgressIndicator(
+          color: Colors.white54,
+        ),
+      );
+    }
+  }
+   bottomIcon({required int index,required String text,required IconData icon}){
+    return InkWell(
+      onTap: () {
+        setState(() {
+          currentPageIndex = index;
+        });
+      },
+      child: Column(
+        children: [
+          Icon(
+            icon,
+            color: Colors.white54,
+            size: 25,
+          ),
+          Text(
+            text,
+            style: TextStyle(color: Colors.white54,fontSize: 12),
+          )
+        ],
+      ),
     );
   }
+
+  int currentPageIndex = 0;
 }

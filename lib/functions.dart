@@ -12,15 +12,17 @@ import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlight/themes/github.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
+import 'package:nsideas/Description/Converter.dart';
+import 'package:nsideas/Description/creator.dart';
 import 'package:nsideas/project_files/projects_test.dart';
 import 'package:nsideas/sensors/sub_page.dart';
 import 'package:nsideas/settings/settings.dart';
+import 'package:nsideas/test.dart';
 import 'package:nsideas/textFeild.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
-import 'package:pdfx/pdfx.dart';
-import 'package:photo_view/photo_view.dart';
+
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'ads/ads.dart';
 import 'home_page/home_page.dart';
@@ -35,10 +37,9 @@ import 'package:nsideas/home_page/home_page.dart';
 import 'package:nsideas/settings/settings.dart';
 import 'package:http/http.dart' as http;
 
-
 bool isAnonymousUser() => FirebaseAuth.instance.currentUser!.isAnonymous;
 
-String getID() => DateFormat('kk:mm:ss-d.M.y').format(DateTime.now());
+String getID() => DateFormat('d.M.y-kk:mm:ss').format(DateTime.now());
 
 String userId() => FirebaseAuth.instance.currentUser!.email.toString();
 
@@ -66,6 +67,7 @@ class _CommentsWidgetsState extends State<CommentsWidgets> {
           borderRadius: BorderRadius.circular(20), color: Colors.white),
       child: Column(
         children: [
+
           Row(
             children: [
               Container(
@@ -99,11 +101,54 @@ class _CommentsWidgetsState extends State<CommentsWidgets> {
 const TextStyle creatorHeadingTextStyle =
     TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: Colors.black);
 
-class TextFieldContainer extends StatelessWidget {
-  Widget child;
+class HeadingH1 extends StatelessWidget {
   String heading;
 
-  TextFieldContainer({super.key, required this.child, this.heading = ""});
+  HeadingH1({required this.heading});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(top: 10, left: 10,right: 10,bottom: 5),
+      child: Text(
+        heading,
+        style: TextStyle(
+            fontSize: 25, fontWeight: FontWeight.w500, color: Colors.white),
+      ),
+    );
+  }
+}
+
+class HeadingH2 extends StatelessWidget {
+  String heading;
+
+  HeadingH2({required this.heading});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(top: 10, left: 10,right: 10,bottom: 5),
+      child: Text(
+        heading,
+        style: TextStyle(
+            fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
+      ),
+    );
+  }
+}
+
+class TextFieldContainer extends StatelessWidget {
+  String heading;
+  final controller;
+  final String hintText;
+  final bool obscureText;
+
+  TextFieldContainer(
+      {super.key,
+      required this.controller,
+      required this.hintText,
+      this.obscureText = false,
+      this.heading = ""});
 
   @override
   Widget build(BuildContext context) {
@@ -116,10 +161,7 @@ class TextFieldContainer extends StatelessWidget {
             padding: const EdgeInsets.only(left: 15, top: 8),
             child: Text(
               heading,
-              style: TextStyle(
-                  fontSize: 15,
-
-                  color: Colors.black),
+              style: TextStyle(fontSize: 15, color: Colors.white),
             ),
           ),
         Padding(
@@ -127,35 +169,37 @@ class TextFieldContainer extends StatelessWidget {
               const EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
           child: Container(
             decoration: BoxDecoration(
-                color: Colors.white,
-                // border: Border.all(color: Colors.white54),
+                color: Colors.white12,
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: Colors.black.withOpacity(0.15))),
+                border: Border.all(color: Colors.white.withOpacity(0.15))),
             child: Padding(
-              padding: const EdgeInsets.only(left: 10),
-              child: child,
+              padding: EdgeInsets.only(left: 10),
+              child: TextFormField(
+                controller: controller,
+                obscureText: obscureText,
+                textInputAction: TextInputAction.next,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 20,
+                ),
+                maxLines: null,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  hintText: hintText,
+                  hintStyle: TextStyle(
+                    color: Colors.white54,
+                    fontWeight: FontWeight.w300,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
             ),
           ),
         ),
       ],
     );
   }
-}
-
-TextStyle textFieldStyle() {
-  return TextStyle(
-    color: Colors.black,
-    fontWeight: FontWeight.w500,
-    fontSize: 20,
-  );
-}
-
-TextStyle textFieldHintStyle() {
-  return TextStyle(
-    color: Colors.black54,
-    fontWeight: FontWeight.w300,
-    fontSize: 18,
-  );
 }
 
 class ImageShowAndDownload extends StatefulWidget {
@@ -249,16 +293,17 @@ class _ImageShowAndDownloadState extends State<ImageShowAndDownload> {
               context,
               MaterialPageRoute(
                 builder: (context) => Scaffold(
-                  backgroundColor: Colors.black,
                   body: SafeArea(
                     child: Column(
                       children: [
                         backButton(),
                         Expanded(
-                          child: Center(
-                            child: Image.file(
-                              File(filePath),
-                              fit: BoxFit.contain,
+                          child: InteractiveViewer(
+                            child: Center(
+                              child: Image.file(
+                                File(filePath),
+                                fit: BoxFit.contain,
+                              ),
                             ),
                           ),
                         ),
@@ -305,10 +350,10 @@ class _backButtonState extends State<backButton> {
               Navigator.pop(context);
             },
             child: Container(
-              padding: EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+              padding: EdgeInsets.symmetric(horizontal: 8),
               margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
               decoration: BoxDecoration(
-                  color: Colors.black, borderRadius: BorderRadius.circular(20)),
+                  color: Colors.white, borderRadius: BorderRadius.circular(20)),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -316,11 +361,11 @@ class _backButtonState extends State<backButton> {
                   Icon(
                     Icons.arrow_back,
                     size: 20,
-                    color: Colors.white,
+                    color: Colors.black87,
                   ),
                   Text(
                     "back ",
-                    style: TextStyle(fontSize: 16, color: Colors.white),
+                    style: TextStyle(fontSize: 16, color: Colors.black),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
@@ -377,7 +422,7 @@ class _scrollingImagesState extends State<scrollingImages> {
                 }),
             itemBuilder:
                 (BuildContext context, int itemIndex, int pageViewIndex) {
-              return  ClipRRect(
+              return ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: AspectRatio(
                   aspectRatio: widget.ar.aspectRatio,
@@ -435,7 +480,7 @@ class _tableOfContentState extends State<tableOfContent> {
       padding: EdgeInsets.all(10.0),
       alignment: Alignment.center,
       decoration: BoxDecoration(
-          color: Colors.white,
+          color: Colors.white10,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: Colors.white10)),
       child: Column(
@@ -460,18 +505,18 @@ class _tableOfContentState extends State<tableOfContent> {
                         Icon(
                           Icons.circle,
                           size: 5,
-                          color: Colors.black87,
+                          color: Colors.white54,
                         ),
                       ],
                     ),
                     SizedBox(
-                      width: 10,
+                      width: 5,
                     ),
                     Text(
                       name,
                       style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.black,
+                        fontSize: 18,
+                        color: Colors.white,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -487,26 +532,28 @@ class _tableOfContentState extends State<tableOfContent> {
   }
 }
 
-class Requires extends StatefulWidget {
+class ConvertorForTRCSRC_Container extends StatefulWidget {
   List<ConvertorForTRCSRC> data;
   String title;
 
-  Requires({required this.data, required this.title});
+  ConvertorForTRCSRC_Container({required this.data, required this.title});
 
   @override
-  State<Requires> createState() => _RequiresState();
+  State<ConvertorForTRCSRC_Container> createState() =>
+      _ConvertorForTRCSRC_ContainerState();
 }
 
-class _RequiresState extends State<Requires> {
+class _ConvertorForTRCSRC_ContainerState
+    extends State<ConvertorForTRCSRC_Container> {
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.all(10.0),
-      padding: EdgeInsets.all(10.0),
+      padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
       alignment: Alignment.center,
       decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          color: Colors.white12,
+          borderRadius: BorderRadius.circular(15),
           border: Border.all(color: Colors.black.withOpacity(0.1))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -529,7 +576,7 @@ class _RequiresState extends State<Requires> {
                       Icon(
                         Icons.circle,
                         size: 5,
-                        color: Colors.black,
+                        color: Colors.white54,
                       ),
                     ],
                   ),
@@ -542,30 +589,34 @@ class _RequiresState extends State<Requires> {
                         data.heading,
                         style: TextStyle(
                           fontSize: 18,
-                          color: Colors.black87,
+                          color: Colors.white,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                       onTap: () {
-                        if (data.IVF!=null)
+                        if (data.ivf.fileUrl.isNotEmpty)
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => zoom(url: data.IVF.file_url)));
+                                  builder: (context) =>
+                                      zoom(url: data.ivf.fileUrl)));
                         else {
                           showToastText("Image Not Found");
                         }
                       },
                     ),
                   ),
-                  if (data.path!=null)
+                  if (data.path != null)
                     InkWell(
+                      onTap: () {
+                        showToastText(
+                            "Go to ${data.path.path.isNotEmpty ? data.path.path : "No Path"}");
+                      },
                       child: Icon(
                         Icons.open_in_new,
-                        color: Colors.lightGreenAccent,
+                        color: Colors.orangeAccent,
                       ),
-
                     ),
                 ],
               );
@@ -631,497 +682,8 @@ class _zoomState extends State<zoom> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: PhotoView(
-          imageProvider: NetworkImage(widget.url),
-        ),
-      ),
-    );
-  }
-}
-
-class Description extends StatefulWidget {
-  final List<DescriptionConvertor> data;
-  final String id;
-  final String mode;
-
-  Description({required this.id, required this.data, required this.mode});
-
-  @override
-  State<Description> createState() => _DescriptionState();
-}
-
-class _DescriptionState extends State<Description> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.all(5),
-      padding: EdgeInsets.all(10),
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20), color: Colors.white),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (isOwner())
-            Row(
-              children: [
-                ElevatedButton(
-                  child: Text("ADD"),
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => DescriptionCreator(
-                                  id: widget.id,
-                                  mode: widget.mode,
-                                )));
-                  },
-                ),
-              ],
-            ),
-          ListView.separated(
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: widget.data.length,
-            shrinkWrap: true,
-            itemBuilder: (BuildContext context, int index) {
-              final data = widget.data[index];
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-
-                  if (isOwner())
-                    IconButton(
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => DescriptionCreator(
-                                        id: widget.id,
-                                        mode: widget.mode,
-                                        data: data,
-                                      )));
-                        },
-                        icon: Icon(Icons.edit)),
-                  if (data.points.isNotEmpty)
-                    StyledTextWidget(
-                      text: data.heading,
-                      fontSize: 20,
-                      color: Colors.black,
-                    )
-                  else if (data.IVF.isNotEmpty)
-                    StyledTextWidget(
-                      text: data.heading,
-                      fontSize: 20,
-                      color: Colors.black87,
-                    )
-                  else
-                    StyledTextWidget(
-                        text: data.heading,
-                        fontSize: 20,
-                        color: Colors.black.withOpacity(0.9)),
-                  if (data.IVF.isNotEmpty)
-                    Padding(
-                      padding: EdgeInsets.only(top: 20),
-                      child: scrollingImages(
-                        images: data.IVF
-                            .map((HomePageImage) => HomePageImage?.file_url)
-                            .toList(),
-                        id: widget.id,
-                        isZoom: true,
-                      ),
-                    ),
-                  if (data.points.isNotEmpty)
-                    ListView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: data.points.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          if (data.points.isNotEmpty) {
-                            return Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "${index + 1}. ",
-                                    style: TextStyle(
-                                        color: Colors.black, fontSize: 14),
-                                  ),
-                                  Expanded(
-                                      child: StyledTextWidget(
-                                          text: data.points[index],
-                                          color: Colors.black.withOpacity(0.8),
-                                          fontSize: 16)),
-                                ],
-                              ),
-                            );
-                          } else {
-                            return Padding(
-                                padding: EdgeInsets.all(5.0),
-                                child: StyledTextWidget(
-                                    text: data.points[index],
-                                    color: Colors.amberAccent,
-                                    fontSize: 20));
-                          }
-                        }),
-                  if (data.table.isNotEmpty)
-                    Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: Colors.black,
-                            borderRadius: BorderRadius.circular(15)),
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemCount: data.table
-                              .length, // Number of rows including the header
-                          itemBuilder: (context, index) {
-                            TableConvertor subTechnicalParameters =
-                                data.table[index];
-                            return Table(
-                              border: TableBorder.all(
-                                  width: 0.5,
-                                  color: Colors.white,
-                                  borderRadius: index == 0
-                                      ? BorderRadius.only(
-                                          topLeft: Radius.circular(15),
-                                          topRight: Radius.circular(15))
-                                      : index == data.table.length - 1
-                                          ? BorderRadius.only(
-                                              bottomLeft: Radius.circular(15),
-                                              bottomRight: Radius.circular(15))
-                                          : BorderRadius.circular(0)),
-                              defaultVerticalAlignment:
-                                  TableCellVerticalAlignment.middle,
-                              columnWidths: const {
-                                0: FractionColumnWidth(0.2),
-                                1: FractionColumnWidth(0.5),
-                              },
-                              children: [
-                                TableRow(
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8)),
-                                  children: [
-                                    TableCell(
-                                      child: Padding(
-                                        padding: EdgeInsets.all(8.0),
-                                        child: Text(
-                                          textAlign: TextAlign.center,
-                                          subTechnicalParameters.col0,
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                    TableCell(
-                                      child: Padding(
-                                        padding: EdgeInsets.all(8.0),
-                                        child: Text(
-                                            textAlign: TextAlign.center,
-                                            subTechnicalParameters.col1,
-                                            style:
-                                                TextStyle(color: Colors.white)),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  if (data.files.isNotEmpty)
-                    ListView.builder(
-                        itemCount: data.files.length,
-                        physics: NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemBuilder: (context, int index) {
-                          final fdata = data.files[index];
-                          return InkWell(
-                            onTap: () {
-                              Navigator.push(context,
-                                  MaterialPageRoute(builder: (context) {
-                                return CodeFileView(
-                                  code: fdata.code,
-                                  lang: fdata.lang,
-                                );
-                              }));
-                            },
-                            child: Container(
-                              // constraints: BoxConstraints(maxHeight: 200),
-                              margin: EdgeInsets.symmetric(vertical: 2.0),
-                              padding: EdgeInsets.symmetric(vertical: 3.0),
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.05),
-                                // border: Border.all(color: Colors.white24),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  SizedBox(
-                                      height: 50,
-                                      child:
-                                          Image.asset("assets/file_icon.png")),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        fdata.heading,
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                      Text(fdata.lang),
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
-                          );
-                        })
-                ],
-              );
-            },
-            separatorBuilder: (context, index) => SizedBox(
-              height: 15,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class CodeFileView extends StatefulWidget {
-  String code;
-  String lang;
-
-  CodeFileView({required this.code, required this.lang});
-
-  @override
-  State<CodeFileView> createState() => _CodeFileViewState();
-}
-
-class _CodeFileViewState extends State<CodeFileView> {
-  double FontSize = 12;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                backButton(),
-                InkWell(
-                  onTap: () {
-                    Clipboard.setData(ClipboardData(text: widget.code));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Code copied to clipboard')),
-                    );
-                  },
-                  child: Container(
-                    margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                    padding: EdgeInsets.symmetric(vertical: 3, horizontal: 15),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: Colors.white),
-                    child: Row(
-                      children: [
-                        Icon(Icons.copy),
-                        Text(
-                          " Copy Code",
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w500),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-                Row(
-                  children: [
-                    InkWell(
-                        onTap: () {
-                          if (FontSize < 30) {
-                            setState(() {
-                              FontSize++;
-                            });
-                          } else {
-                            showToastText("Max Size");
-                          }
-                        },
-                        child: Container(
-                          padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(25),
-                              color: Colors.white),
-                          child: Text(
-                            "+",
-                            style: TextStyle(fontSize: 20),
-                          ),
-                        )),
-                    InkWell(
-                        onTap: () {
-                          if (FontSize < 5) {
-                            showToastText("Min Size");
-                          } else {
-                            setState(() {
-                              FontSize--;
-                            });
-                          }
-                        },
-                        child: Container(
-                            padding:
-                            EdgeInsets.symmetric(vertical: 5, horizontal: 15),
-                            margin:EdgeInsets.symmetric( horizontal: 10),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(25),
-                                color: Colors.white),
-                            child: Text(
-                              "-",
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ))),
-                  ],
-                )
-              ],
-            ),
-            Expanded(
-              child: Stack(
-                children: [
-                  SingleChildScrollView(
-                    child: HighlightView(
-                      padding: EdgeInsets.only(left: 10,right: 10,top: 10,bottom: 150),
-                      widget.code,
-                      language: widget.lang,
-                      theme: githubTheme,
-                tabSize:20,
-                      textStyle:
-                          TextStyle(fontSize: FontSize), // Set the font size
-                    ),
-                  ),
-                  Positioned(bottom:0,left: 0,right: 0,child:   Align(
-                    alignment: Alignment.bottomCenter,
-                    child: CustomAdsBannerForPdfs(  ),
-                  ))
-                ],
-              ),
-            ),
-
-          ],
-        ),
-      ),
-
-    );
-  }
-}
-
-class youtubeInfo extends StatefulWidget {
-  String url;
-
-  youtubeInfo({required this.url});
-
-  @override
-  State<youtubeInfo> createState() => _youtubeInfoState();
-}
-
-class _youtubeInfoState extends State<youtubeInfo> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      margin: const EdgeInsets.all(10),
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(25),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          HeadingWithDivider(
-            heading: "Making Video",
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                InkWell(
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: Colors.black,
-                        borderRadius: BorderRadius.circular(20)),
-                    child: Padding(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 5.0, horizontal: 15),
-                      child: Text(
-                        "Play",
-                        style: TextStyle(color: Colors.white, fontSize: 20),
-                      ),
-                    ),
-                  ),
-                  onTap: () {
-                    showDialog<void>(
-                      context: context,
-                      barrierDismissible: false, // user must tap button!
-                      builder: (BuildContext context) {
-                        return youtube(
-                          url: widget.url,
-                        );
-                      },
-                    );
-                  },
-                ),
-                InkWell(
-                  child: Container(
-                    padding:
-                        EdgeInsets.symmetric(vertical: 2.0, horizontal: 10),
-                    decoration: BoxDecoration(
-                        color: Colors.black,
-                        borderRadius: BorderRadius.circular(25)),
-                    child: Row(
-                      children: [
-                        Text(
-                          " View On ",
-                          style: TextStyle(color: Colors.white, fontSize: 20),
-                        ),
-                        Container(
-                            height: 40,
-                            width: 100,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                image: const DecorationImage(
-                                    fit: BoxFit.cover,
-                                    image: NetworkImage(
-                                        "https://ghiencongnghe.info/wp-content/uploads/2021/02/bia-youtube-la-gi.gif"))))
-                      ],
-                    ),
-                  ),
-                  onTap: () {
-                    ExternalLaunchUrl(widget.url);
-                  },
-                ),
-              ],
-            ),
-          ),
-        ],
+      body: InteractiveViewer(
+        child: Image.network(widget.url),
       ),
     );
   }
@@ -1137,7 +699,7 @@ class StyledTextWidget extends StatelessWidget {
     super.key,
     required this.text,
     this.fontSize = 16,
-    this.color = Colors.black,
+    this.color = Colors.white,
     this.fontWeight = FontWeight.normal,
   });
 

@@ -3,96 +3,82 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../functions.dart';
 import '../uploader/telegram_uploader.dart';
 
-class AppsConvertor {
-  final String name,id;
-  final String bundleId;
+class AppsConverter {
+  final String name, id;
   final String version;
   final String size;
   final bool supportsAds;
   final bool inAppPurchases;
   final Developer developer;
-  final List<String> supported;
-  final List<String> platforms;
-  final List<String> languages;
+  final List<String> appSupportedDevices;
+  final List<String> appSupportedLanguages;
   final String about;
   final String updateDate;
-  final List<String> description;
-  final IVFUploader icon;
-  final List<IVFUploader> screenshots;
-  final String appStoreLink;
-  final String playStoreLink;
+  final List<String> points;
+  final FileUploader icon;
+  final List<FileUploader> images;
+  final List<AppDownloadLinks> appDownloadLinks;
 
-  AppsConvertor({
+  AppsConverter({
     required this.name,
     required this.id,
-    required this.bundleId,
     required this.version,
     required this.size,
     required this.supportsAds,
     required this.inAppPurchases,
     required this.developer,
-    required this.supported,
-    required this.platforms,
-    required this.languages,
+    required this.appSupportedDevices,
+    required this.appSupportedLanguages,
     required this.about,
     required this.updateDate,
-    required this.description,
+    required this.points,
     required this.icon,
-    required this.screenshots,
-    required this.appStoreLink,
-    required this.playStoreLink,
+    required this.images,
+    required this.appDownloadLinks,
   });
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'name': name,
-      'bundle_id': bundleId,
       'version': version,
       'size': size,
-      'supports_ads': supportsAds,
-      'in_app_purchases': inAppPurchases,
+      'supportsAds': supportsAds,
+      'inAppPurchases': inAppPurchases,
       'developer': developer.toJson(),
-      'supported': supported,
-      'platforms': platforms,
-      'languages': languages,
+      'appSupportedDevices': appSupportedDevices,
+      'appSupportedLanguages': appSupportedLanguages,
       'about': about,
-      'update_date': updateDate,
-      'description': description,
-      'icon': icon.toJson(), // Corrected this line
-      'screenshots': screenshots.map((screenshot) => screenshot.toJson()).toList(), // Corrected this line
-      'app_store_link': appStoreLink,
-      'play_store_link': playStoreLink,
+      'updateDate': updateDate,
+      'points': points,
+      'icon': icon.toJson(),
+      'screenshots': images.map((screenshot) => screenshot.toJson()).toList(),
+      'appDownloadLinks': appDownloadLinks.map((link) => link.toJson()).toList(),
     };
   }
 
-  factory AppsConvertor.fromJson(Map<String, dynamic> json) {
-    return AppsConvertor(
+  factory AppsConverter.fromJson(Map<String, dynamic> json) {
+    return AppsConverter(
       id: json['id'],
       name: json['name'],
-      bundleId: json['bundle_id'],
       version: json['version'],
       size: json['size'],
-      supportsAds: json['supports_ads'] ?? false,
-      inAppPurchases: json['in_app_purchases'] ?? false,
+      supportsAds: json['supportsAds'] ?? false,
+      inAppPurchases: json['inAppPurchases'] ?? false,
       developer: Developer.fromJson(json['developer']),
-      supported: List<String>.from(json['supported']),
-      platforms: List<String>.from(json['platforms']),
-      languages: List<String>.from(json['languages']),
+      appSupportedDevices: List<String>.from(json['appSupportedDevices']),
+      appSupportedLanguages: List<String>.from(json['appSupportedLanguages']),
       about: json['about'],
-      updateDate: json['update_date'],
-      description: List<String>.from(json['description']),
-      icon: IVFUploader.fromJson(json['icon']), // Corrected this line
-      screenshots: (json['screenshots'] as List<dynamic>).map((screenshot) => IVFUploader.fromJson(screenshot)).toList(), // Corrected this line
-      appStoreLink: json['app_store_link'],
-      playStoreLink: json['play_store_link'],
+      updateDate: json['updateDate'],
+      points: List<String>.from(json['points']),
+      icon: FileUploader.fromJson(json['icon']),
+      images: (json['screenshots'] as List<dynamic>).map((screenshot) => FileUploader.fromJson(screenshot)).toList(),
+      appDownloadLinks: (json['appDownloadLinks'] as List<dynamic>).map((link) => AppDownloadLinks.fromJson(link)).toList(),
     );
   }
 }
-
 
 class Developer {
   final String name;
@@ -104,6 +90,7 @@ class Developer {
     required this.website,
     required this.email,
   });
+
   Map<String, dynamic> toJson() {
     return {
       'name': name,
@@ -111,6 +98,7 @@ class Developer {
       'email': email,
     };
   }
+
   factory Developer.fromJson(Map<String, dynamic> json) {
     return Developer(
       name: json['name'],
@@ -120,8 +108,32 @@ class Developer {
   }
 }
 
+class AppDownloadLinks {
+  final String platform;
+  final String link;
 
-Future<List<AppsConvertor>> getApps(bool isLoading) async {
+  AppDownloadLinks({
+    required this.platform,
+    required this.link,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'platform': platform,
+      'link': link,
+    };
+  }
+
+  factory AppDownloadLinks.fromJson(Map<String, dynamic> json) {
+    return AppDownloadLinks(
+      platform: json['platform'],
+      link: json['link'],
+    );
+  }
+}
+
+
+Future<List<AppsConverter>> getApps(bool isLoading) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
 
   final studyMaterialsJson = prefs.getString("apps") ?? "";
@@ -134,13 +146,13 @@ Future<List<AppsConvertor>> getApps(bool isLoading) async {
         .toList();
     String projectsJson = jsonEncode(projectsData);
     await prefs.setString("apps", projectsJson);
-    List<AppsConvertor> projects =
-    projectsData.map((json) => AppsConvertor.fromJson(json)).toList();
+    List<AppsConverter> projects =
+    projectsData.map((json) => AppsConverter.fromJson(json)).toList();
     return projects;
   } else {
     List<dynamic> projectsJsonList = json.decode(studyMaterialsJson);
-    List<AppsConvertor> projects = projectsJsonList
-        .map((json) => AppsConvertor.fromJson(json))
+    List<AppsConverter> projects = projectsJsonList
+        .map((json) => AppsConverter.fromJson(json))
         .toList();
 
     return projects;

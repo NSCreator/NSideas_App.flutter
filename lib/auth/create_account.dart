@@ -12,6 +12,7 @@ import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server/gmail.dart';
 import 'package:nsideas/main.dart';
 import 'package:nsideas/message/messaging_page.dart';
+import 'package:nsideas/settings/settings.dart';
 import 'package:nsideas/settings/user_convertor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -61,20 +62,10 @@ class _createNewUserState extends State<createNewUser> {
             children: [
               backButton(),
               TextFieldContainer(
-                child: TextFormField(
-                  controller: emailController,
-                  enabled: !isTrue,
-                  textInputAction: TextInputAction.next,
-                  style: textFieldStyle(),
-                  decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: 'Enter Existing Gmail ID',
-                      hintStyle: textFieldHintStyle()),
-                  validator: (email) =>
-                      email != null && !EmailValidator.validate(email)
-                          ? "Enter a valid Email"
-                          : null,
-                ),
+                controller: emailController,
+                hintText: 'Enter Existing Gmail ID',
+
+
                 heading: "Enter Gmail ID",
               ),
               Row(
@@ -83,15 +74,9 @@ class _createNewUserState extends State<createNewUser> {
                   if (isSend)
                     Flexible(
                       child: TextFieldContainer(
-                          child: TextFormField(
-                        controller: otpController,
-                        textInputAction: TextInputAction.next,
-                        style: textFieldStyle(),
-                        decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: 'Enter OPT',
-                            hintStyle: textFieldHintStyle()),
-                      )),
+                          controller: otpController,
+                          hintText: 'Enter OPT',
+                        ),
                     ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 10),
@@ -147,38 +132,20 @@ class _createNewUserState extends State<createNewUser> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Padding(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-                      child: Text(
-                        "Fill the Details",
-                        style: creatorHeadingTextStyle,
-                      ),
-                    ),
+
+                    HeadingH1(heading: "Fill the Details"),
                     TextFieldContainer(
-                        child: TextFormField(
                       controller: fullNameController,
-                      textInputAction: TextInputAction.next,
-                      style: textFieldStyle(),
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: 'Full Name',
-                          hintStyle: textFieldHintStyle()),
-                    )),
-                    Padding(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
-                      child: Text(
-                        'Gender',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w500),
-                      ),
-                    ),
+                      hintText: 'Full Name',
+                      heading: "Full Name",),
+                   HeadingH2(heading: "Gender"),
                     Padding(
                       padding: EdgeInsets.only(left: 10, bottom: 10),
                       child: Row(
                         children: <Widget>[
                           Radio<Gender>(
+
+                            activeColor:Colors.white,
                             value: Gender.male,
                             groupValue: _gender,
                             onChanged: (Gender? value) {
@@ -187,9 +154,10 @@ class _createNewUserState extends State<createNewUser> {
                               });
                             },
                           ),
-                          Text('Male'),
+                          Text('Male',style: TextStyle(color: Colors.white70,fontSize: 20,fontWeight: FontWeight.w500),),
                           Radio<Gender>(
                             value: Gender.female,
+                            activeColor:Colors.white,
                             groupValue: _gender,
                             onChanged: (Gender? value) {
                               setState(() {
@@ -197,9 +165,10 @@ class _createNewUserState extends State<createNewUser> {
                               });
                             },
                           ),
-                          Text('Female'),
+                          Text('Female',style: TextStyle(color: Colors.white70,fontSize: 20,fontWeight: FontWeight.w500),),
                           Radio<Gender>(
                             value: Gender.other,
+                            activeColor:Colors.white,
                             groupValue: _gender,
                             onChanged: (Gender? value) {
                               setState(() {
@@ -207,80 +176,42 @@ class _createNewUserState extends State<createNewUser> {
                               });
                             },
                           ),
-                          Text('Other'),
+                          Text('Other',style: TextStyle(color: Colors.white70,fontSize: 20,fontWeight: FontWeight.w500),),
                         ],
                       ),
                     ),
                     TextFieldContainer(
-                        child: TextFormField(
                       controller: OccupationController,
-                      textInputAction: TextInputAction.next,
-                      style: textFieldStyle(),
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: 'Occupation',
-                          hintStyle: textFieldHintStyle()),
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                    )),
+                      hintText: 'Occupation',
+                      heading: "Occupation",),
                     TextFieldContainer(
-                        child: TextFormField(
                       controller: phoneNoController,
-                      textInputAction: TextInputAction.next,
-                      style: textFieldStyle(),
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: 'Phone Number (+91 only)',
-                          hintStyle: textFieldHintStyle()),
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                    )),
+                      hintText: 'Phone Number (+91 only)  --optional',heading: "Phone Number ( optional )",),
                     Padding(
                       padding: const EdgeInsets.all(10.0),
                       child: Row(
                         children: [
+                          HeadingH1(heading: "Age --- ${_selectedDate != null
+                      ? '${calculateAge(_selectedDate!)} '
+                        : ''}"),
+
+
                           ElevatedButton(
                             onPressed: () => _selectDate(context),
                             child: Text('Select Date of Birth'),
                           ),
-                          Text(
-                            _selectedDate != null
-                                ? '  Age: ${calculateAge(_selectedDate!)}'
-                                : '',
-                            style: TextStyle(fontSize: 18),
-                          ),
+
                         ],
                       ),
                     ),
                     TextFieldContainer(
-                        child: TextFormField(
                       controller: passwordController,
-                      obscureText: true,
-                      textInputAction: TextInputAction.next,
-                      style: textFieldStyle(),
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: 'password',
-                          hintStyle: textFieldHintStyle()),
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: (value) => value != null && value.length < 6
-                          ? "Enter min. 6 characters"
-                          : null,
-                    ),heading: "Password",),
+                      hintText: 'password',
+                      heading: "Password",),
                     TextFieldContainer(
-                        child: TextFormField(
-                      obscureText: true,
-                      controller: passwordController_X,
-                      textInputAction: TextInputAction.next,
-                      style: textFieldStyle(),
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
+                        controller: passwordController_X,
                         hintText: 'Conform Password',
-                        hintStyle: textFieldHintStyle(),
                       ),
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: (value) => value != null && value.length < 6
-                          ? "Enter min. 6 characters"
-                          : null,
-                    )),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -290,7 +221,7 @@ class _createNewUserState extends State<createNewUser> {
                           },
                           child: Padding(
                             padding: EdgeInsets.only(right: 15),
-                            child: Text('cancel ', style: TextStyle(fontSize: 20)),
+                            child: Text('cancel ', style: TextStyle(fontSize: 20,color: Colors.white70)),
                           ),
                         ),
                         TextButton(
@@ -306,7 +237,7 @@ class _createNewUserState extends State<createNewUser> {
                                       child: CircularProgressIndicator(),
                                     ));
                                 try {
-                                  await FirebaseAuth.instance
+                                  await auth
                                       .createUserWithEmailAndPassword(
                                       email: emailController.text
                                           .trim()
@@ -316,37 +247,14 @@ class _createNewUserState extends State<createNewUser> {
                                       .collection("users")
                                       .doc(emailController.text)
                                       .set(UserConvertor(email: emailController.text, id: emailController.text, name: fullNameController.text, age: "$_selectedDate", gender: "$_gender", occupation: OccupationController.text, phoneNumber: phoneNoController.text, addresses: []).toJson());
+                                  await auth.currentUser?.updateDisplayName(fullNameController.text);
+                                  await auth.currentUser?.updatePhotoURL("");
+                                  updateToken(emailController.text);
 
-                                  await FirebaseMessaging.instance
-                                      .getToken()
-                                      .then((token) async {
-                                    if (token != null) {
-                                      await FirebaseFirestore.instance
-                                          .collection("tokens")
-                                          .doc(emailController.text)
-                                          .set({
-                                        "id": emailController.text,
-                                        "token": token,
-                                        "time": getID(),
-                                      }).then((_) {
-                                        print("Token stored successfully");
-                                        messageToOwner(head: "New Family Member",message: emailController.text,payload: {"navigation":"message"});
-
-                                        Navigator.pushReplacement(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) => MyHomePage()));
-                                      }).catchError((error) {
-                                        print("Error storing token: $error");
-                                      });
-                                    } else {
-                                      print("Failed to retrieve FCM token");
-                                    }
-                                  }).catchError((error) {
-                                    print("Error getting FCM token: $error");
-                                    Navigator.pop(context);
-
-                                  });
+                                  Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => MyHomePage()));
 
                                 } on FirebaseException catch (e) {
                                   Navigator.pop(context);
@@ -366,7 +274,7 @@ class _createNewUserState extends State<createNewUser> {
                             padding: EdgeInsets.only(right: 15),
                             child: Text(
                               'Sign up ',
-                              style: TextStyle(fontSize: 20),
+                              style: TextStyle(fontSize: 25,color: Colors.white),
                             ),
                           ),
                         ),

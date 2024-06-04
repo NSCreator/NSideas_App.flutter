@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:nsideas/Description/Converter.dart';
+import 'package:nsideas/Description/creator.dart';
 import 'package:nsideas/functions.dart';
 import 'package:nsideas/sensors/converter.dart';
 import 'package:nsideas/textFeild.dart';
@@ -110,8 +112,8 @@ Future<List<BoardsConverter>> getBoards(bool isLoading) async {
 Future<void> createProject({
   required String id,
   required String type,
-  required String youtubeUrl,
-  required IVFUploader thumbnail,
+
+  required FileUploader thumbnail,
   required bool isUpdate,
   required bool isFree,
   required bool isContainsAds,
@@ -124,14 +126,15 @@ Future<void> createProject({
   required List<ConvertorForTRCSRC> appAndPlatforms,
   required List<ConvertorForTRCSRC> toolsRequired,
   required List<DescriptionConvertor> description,
-  required List<IVFUploader> images,
+  required List<FileUploader> images,
+  required List<YoutubeConvertor> youtubeData,
 }) async {
   final docTrip = FirebaseFirestore.instance.collection('projects').doc(id);
 
   final tripData = ProjectConverter(
     id: id,
     type: type,
-    youtubeUrl: youtubeUrl,
+    youtubeData: youtubeData,
     thumbnail: thumbnail,
     isFree: isFree,
     isContainsAds: isContainsAds,
@@ -158,11 +161,12 @@ Future<void> createProject({
 class ProjectConverter {
   final List<String> displayHere;
   final bool isFree, isContainsAds;
-  final String id, type, about, youtubeUrl;
-  final IVFUploader thumbnail;
+  final String id, type, about;
+  final List<YoutubeConvertor> youtubeData;
+  final FileUploader thumbnail;
   final HeadingConvertor heading;
   final List<String> tableOfContent;
-  final List<IVFUploader> images;
+  final List<FileUploader> images;
   final List<String> tags;
   final List<DescriptionConvertor> description;
   final List<ConvertorForTRCSRC> componentsAndSupplies,
@@ -180,7 +184,7 @@ class ProjectConverter {
     required this.isContainsAds,
     required this.tableOfContent,
     required this.appAndPlatforms,
-    required this.youtubeUrl,
+    required this.youtubeData,
     required this.componentsAndSupplies,
     required this.description,
     required this.about,
@@ -198,7 +202,7 @@ class ProjectConverter {
     "thumbnail": thumbnail.toJson(), // Assuming IVFUploader has a toJson method
     "isContainsAds": isContainsAds,
     "isFree": isFree,
-    "youtubeLink": youtubeUrl,
+    "youtubeData": youtubeData.map((textBook) => textBook.toJson()).toList(),
     "heading": heading.toJson(),
     "descriptions": description.map((unit) => unit.toJson()).toList(),
     "componentsAndSupplies":
@@ -216,8 +220,8 @@ class ProjectConverter {
         id: json['id'] ?? "",
         type: json['type'] ?? "",
         about: json['about'] ?? "",
-        youtubeUrl: json['youtubeLink'] ?? "",
-        thumbnail: IVFUploader.fromJson(json['thumbnail'] ?? {}),
+        youtubeData: YoutubeConvertor.fromMapList(json['youtubeData'] ?? []),
+        thumbnail: FileUploader.fromJson(json['thumbnail'] ?? {}),
         heading: HeadingConvertor.fromJson(json['heading'] ?? {}),
         isFree: json['isFree'] ?? false,
         isContainsAds: json['isContainsAds'] ?? false,
@@ -228,7 +232,7 @@ class ProjectConverter {
         appAndPlatforms: ConvertorForTRCSRC.fromMapList(json['appAndPlatforms'] ?? []),
         toolsRequired: ConvertorForTRCSRC.fromMapList(json['toolsRequired'] ?? []),
         description: DescriptionConvertor.fromMapList(json['descriptions'] ?? []),
-        images: IVFUploader.fromMapList(json['images'] ?? []),
+        images: FileUploader.fromMapList(json['images'] ?? []),
       );
 
   static List<ProjectConverter> fromMapList(List<dynamic> list) {
@@ -257,96 +261,31 @@ class HeadingConvertor {
     return list.map((item) => fromJson(item)).toList();
   }
 }
-
-class DescriptionConvertor {
+class YoutubeConvertor {
   final String heading;
-  final List<TableConvertor> table;
-  final List<String> points;
-  final List<IVFUploader> IVF;
-  final List<CodeFilesConvertor> files;
+  final String video_url;
+  final String thumbnail_url;
+  final String note;
 
-  DescriptionConvertor({
+  YoutubeConvertor({
+    required this.video_url,
     required this.heading,
-    required this.points,
-    required this.IVF,
-    required this.files,
-    required this.table,
+    required this.note,
+    required this.thumbnail_url,
   });
 
-  Map<String, dynamic> toJson() => {
-        "heading": heading,
-        "points": points.toList(),
-        'IVF': IVF.map((image) => image.toJson()).toList(), // Fix here
-        'files': files.map((file) => file.toJson()).toList(),
-        'table': table.map((table) => table.toJson()).toList(),
-      };
+  Map<String, dynamic> toJson() => {"video_url": video_url,"note": note, "heading": heading,"thumbnail_url":thumbnail_url};
 
-  static DescriptionConvertor fromJson(Map<String, dynamic> json) =>
-      DescriptionConvertor(
-        heading: json["heading"],
-        points: List<String>.from(json["points"]),
-        IVF: (json['IVF'] as List<dynamic>? ?? [])
-            .map((item) => IVFUploader.fromJson(item))
-            .toList(),
-        files: (json['files'] as List<dynamic>? ?? [])
-            .map((item) => CodeFilesConvertor.fromJson(item))
-            .toList(),
-        table: TableConvertor.fromMapList(json['table'] ?? []),
+  static YoutubeConvertor fromJson(Map<String, dynamic> json) =>
+      YoutubeConvertor(
+        heading: json['heading'] ?? "",
+        note: json['note'] ?? "",
+        video_url: json["video_url"] ?? "",
+        thumbnail_url: json["thumbnail_url"] ?? "",
       );
 
-  static List<DescriptionConvertor> fromMapList(List<dynamic> list) {
+  static List<YoutubeConvertor> fromMapList(List<dynamic> list) {
     return list.map((item) => fromJson(item)).toList();
   }
 }
 
-class ConvertorForTRCSRC {
-  final String heading;
-  final Path path;
-  final IVFUploader IVF;
-
-  ConvertorForTRCSRC({
-    required this.heading,
-    required this.path,
-    required this.IVF,
-  });
-
-  Map<String, dynamic> toJson() => {
-        "heading": heading,
-        "path": path.toJson(),
-        'IVF': IVF.toJson(), // Convert IVFUploader to JSON
-      };
-
-  static ConvertorForTRCSRC fromJson(Map<String, dynamic> json) =>
-      ConvertorForTRCSRC(
-        heading: json["heading"] ?? "",
-        IVF: IVFUploader.fromJson(json["IVF"] ?? {}),
-        path: Path.fromJson(json["path"] ?? {}),
-      );
-
-  static List<ConvertorForTRCSRC> fromMapList(List<dynamic> list) {
-    return list.map((item) => fromJson(item)).toList();
-  }
-}
-
-class Path {
-  final String id, path;
-
-  Path({
-    required this.id,
-    required this.path,
-  });
-
-  Map<String, dynamic> toJson() => {
-        "id": id,
-        "path": path,
-      };
-
-  static Path fromJson(Map<String, dynamic> json) => Path(
-        id: json["id"] ?? "",
-        path: json["path"] ?? "",
-      );
-
-  static List<Path> fromMapList(List<dynamic> list) {
-    return list.map((item) => fromJson(item)).toList();
-  }
-}

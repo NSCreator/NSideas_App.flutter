@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:nsideas/home_page/home_page.dart';
 import 'package:nsideas/settings/user_convertor.dart';
 import 'package:nsideas/shopping/Converter.dart';
+import 'package:nsideas/test.dart';
 
 import '../functions.dart';
 import '../test1.dart';
@@ -29,10 +30,7 @@ class _orders_pageState extends State<orders_page> {
               crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
             backButton(),
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Text("Our Orders,${userId().split("@").first}",style: TextStyle(fontWeight: FontWeight.w400,fontSize: 20),),
-            ),
+            HeadingH2(heading:"Our Orders,${userId().split("@").first}"),
             StreamBuilder<List<OrdersConverter>>(
               stream: readOrders(),
               builder: (context, snapshot) {

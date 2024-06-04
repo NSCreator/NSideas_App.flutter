@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "503839723767",
+    "firebase_url": "https://ns-ideas-app-default-rtdb.firebaseio.com",
     "project_id": "ns-ideas-app",
     "storage_bucket": "ns-ideas-app.appspot.com"
   },
@@ -13,6 +14,22 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "503839723767-gtsfrdnl1egu87gjp126g20tvlqd711s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nimmalasujith.nsideas",
+            "certificate_hash": "25524018cfd2ca5c07d276ec01277e71cd525f4b"
+          }
+        },
+        {
+          "client_id": "503839723767-qmegk8qo7f7f47e8p6v9n3gae27kqgc7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nimmalasujith.nsideas",
+            "certificate_hash": "6840a964a93ad3e1b1db7830327666177981f3ec"
+          }
+        },
         {
           "client_id": "503839723767-d8ojrc6f43jefa22inevjomkjv7d6d84.apps.googleusercontent.com",
           "client_type": 3
@@ -29,10 +46,18 @@
             {
               "client_id": "503839723767-d8ojrc6f43jefa22inevjomkjv7d6d84.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "503839723767-8oc7kt8unv98t5g3drsi881mvue6gp68.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.nimmalasujith.nsideas"
+              }
             }
           ]
         }
-      }
+      },
+      "admob_app_id": "ca-app-pub-7097300908994281~3389304453"
     }
   ],
   "configuration_version": "1"

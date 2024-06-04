@@ -1,9 +1,13 @@
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:flutter/material.dart';
 
+import '../Description/description.dart';
 import '../functions.dart';
+import '../home_page/home_page.dart';
+import '../test.dart';
 import '../textFeild.dart';
 import 'converter.dart';
+import 'creator.dart';
 
 class sensor extends StatefulWidget {
   SensorsConverter data;
@@ -38,22 +42,68 @@ class _sensorState extends State<sensor> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                backButton(),
-                if(widget.data.images.isNotEmpty)scrollingImages(
-                  images: widget.data.images,
-                  id: widget.data.id,
-                  isZoom: true,
+                Row(
+                  children: [
+                    backButton(),
+                    if (isOwner())
+                      PopupMenuButton<String>(
+                        child: Icon(Icons.more_vert),
+                        itemBuilder: (BuildContext context) =>
+                        <PopupMenuEntry<String>>[
+                          PopupMenuItem<String>(
+                            value: 'edit',
+                            child: Text('Edit'),
+                          ),
+                          PopupMenuItem<String>(
+                            value: 'delete',
+                            child: Text('Delete'),
+                          ),
+                        ],
+                        onSelected: (String value) {
+                          if (value == 'edit') {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => SensorsCreator(
+                                      data: widget.data,
+                                    )));
+                          } else if (value == 'delete') {
+                            showToastText('Delete action selected');
+                          }
+                        },
+                      ),
+                  ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 15,horizontal: 10),
-                  child: Text(widget.data.heading.full,style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold),),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(left: 8,right: 8, top: 20),
+                HeadingH2(heading:widget.data.heading.short),
+                if(widget.data.thumbnail.fileUrl.isNotEmpty)ImageShowAndDownload(image: widget.data.thumbnail.fileUrl, id:widget.data.type ),
+                if (widget.data.heading.full.isNotEmpty)
+                  Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      widget.data.heading.full,
+                      style: TextStyle(fontSize: 25, color: Colors.white,fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                if (widget.data.images.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: scrollingImages(
+                        images: widget.data.images
+                            .map((HomePageImage) => HomePageImage.fileUrl)
+                            .toList(),
+                        id: widget.data.type,
+                        isZoom: true,
+                        ar: AspectRatio(
+                          aspectRatio: 16 / 6,
+                        )),
+                  ),
+
+
+                if(widget.data.about.isNotEmpty) Padding(
+                  padding: EdgeInsets.only(left: 10,right: 8, top: 20),
                   child: Column(
                     children: [
                       HeadingWithDivider(heading:"About Sensor" ,),
-
                       Padding(
                         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                         child: Text(
@@ -137,24 +187,14 @@ class _sensorState extends State<sensor> {
                           ),
                         ),
                       ),
-                      if (widget.data.pinDiagrams.isNotEmpty)
+
                         Padding(
-                          padding: EdgeInsets.symmetric(vertical: 20),
+                          padding: EdgeInsets.symmetric(vertical: 10),
                           child: Column(
                             children: [
                               HeadingWithDivider(heading:"Pin Connections" ,),
-                              Padding(
-                                padding: EdgeInsets.only(bottom: 20),
-                                child: Container(
-                                  height: 2,
-                                  width: 30,
-                                  decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(5)),
-                                ),
-                              ),
-                              scrollingImages(
-                                images: widget.data.pinDiagrams,
+                              if (widget.data.pinDiagram.fileUrl.isNotEmpty)ImageShowAndDownload(
+                                image: widget.data.pinDiagram.fileUrl,
                                 id: widget.data.id,
                                 isZoom: true,
                               ),
@@ -163,7 +203,7 @@ class _sensorState extends State<sensor> {
                         ),
                       Padding(
                         padding:
-                        EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                        EdgeInsets.symmetric(horizontal: 8),
                         child: Container(
                           decoration: BoxDecoration(
                               color: Colors.black,
@@ -257,12 +297,12 @@ class HeadingWithDivider extends StatelessWidget {
           child: Text(
             "  $heading  ",
             style: TextStyle(
-                color: Colors.black,
+                color: Colors.white,
                 fontSize: 20,
                 fontWeight: FontWeight.w500),
           ),
         ),
-        Expanded(child: Divider()),
+        Expanded(child: Divider(color: Colors.white54,)),
       ],
     );
   }

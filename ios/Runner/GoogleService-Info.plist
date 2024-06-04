@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>503839723767-8oc7kt8unv98t5g3drsi881mvue6gp68.apps.googleusercontent.com</string>
+	<string>503839723767-h1e4k2r40kfn5u4cvkeqauh84qu6sjb5.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.503839723767-8oc7kt8unv98t5g3drsi881mvue6gp68</string>
+	<string>com.googleusercontent.apps.503839723767-h1e4k2r40kfn5u4cvkeqauh84qu6sjb5</string>
 	<key>ANDROID_CLIENT_ID</key>
 	<string>503839723767-bvkrrfg885ijuj26l79at4hkc9rqp96g.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
@@ -15,7 +15,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.nimmalasujith.nsideas</string>
+	<string>com.nimmalasujith.nsideasApp</string>
 	<key>PROJECT_ID</key>
 	<string>ns-ideas-app</string>
 	<key>STORAGE_BUCKET</key>
@@ -31,7 +31,7 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:503839723767:ios:9b0b652edc81895e8a43f2</string>
+	<string>1:503839723767:ios:37353c44573f837d8a43f2</string>
 	<key>DATABASE_URL</key>
 	<string>https://ns-ideas-app-default-rtdb.firebaseio.com</string>
 </dict>

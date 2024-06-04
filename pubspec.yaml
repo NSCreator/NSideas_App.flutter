@@ -1,7 +1,7 @@
 name: nsideas
 description: "A new Flutter project."
 publish_to: 'none'
-version: 1.0.06+6
+version: 1.0.1+10
 environment:
   sdk: '>=3.2.0-238.0.dev <4.0.0'
 dependencies:
@@ -19,25 +19,27 @@ dependencies:
   carousel_slider:
   shared_preferences:
   intl:
-  photo_view:
+  google_sign_in:
   path_provider:
   http:
   url_launcher:
   youtube_player_flutter:
   flutter_rating_bar:
   pdfx:
-  open_filex:
+  firebase_analytics:
+
+#  open_filex:
   firebase_storage:
 #  encrypt:
   flutter_svg:
   flutter_local_notifications:
-  flutter_gradient_animation_text:
   rxdart:
   file_picker:
   flutter_highlight:
   google_mobile_ads:
   google_fonts:
-  badges: ^3.1.2
+  badges:
+  firebase_database:
 
 
 #  video_player:

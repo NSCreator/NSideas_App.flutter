@@ -5,9 +5,12 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:nsideas/Description/Converter.dart';
+import 'package:nsideas/Description/creator.dart';
 import 'package:nsideas/project_files/projects_test.dart';
 import 'package:nsideas/project_files/sub_page.dart';
 import 'package:nsideas/sensors/sub_page.dart';
+import 'package:nsideas/settings/settings.dart';
 import 'package:nsideas/uploader/telegram_uploader.dart';
 
 import 'functions.dart';
@@ -27,30 +30,29 @@ class ProjectCreator extends StatefulWidget {
 class _ProjectCreatorState extends State<ProjectCreator> {
   final HeadingFirstController = TextEditingController();
   final HeadingLastController = TextEditingController();
+  FileUploader? IVF_Thumbnail;
   final DescriptionController = TextEditingController();
-  final tableOfContentController = TextEditingController();
   final TypeController = TextEditingController();
-  final YoutubeLinkController = TextEditingController();
-  List<IVFUploader> iv = [];
+
+  List<FileUploader> IVF_Images = [];
 
   void AutoFill() {
-
     setState(() {
       isFree = widget.data!.isFree;
+      if(widget.data!.thumbnail.fileName.isNotEmpty)IVF_Thumbnail= widget.data!.thumbnail;
       isContainsAds = widget.data!.isContainsAds;
       descriptionList = widget.data!.description;
       HeadingFirstController.text = widget.data!.heading.short;
       HeadingLastController.text = widget.data!.heading.full;
       TypeController.text = widget.data!.type;
-      YoutubeLinkController.text = widget.data!.youtubeUrl;
-      iv = widget.data!.images;
+      youtubeData = widget.data!.youtubeData;
+      IVF_Images = widget.data!.images;
       DescriptionController.text = widget.data!.about;
       tableOfContentList = widget.data!.tableOfContent;
       TagsList = widget.data!.tags;
       appAndPlatforms = widget.data!.appAndPlatforms;
       toolsRequired = widget.data!.toolsRequired;
       ComponentsAndSupplies = widget.data!.componentsAndSupplies;
-
     });
   }
 
@@ -60,201 +62,48 @@ class _ProjectCreatorState extends State<ProjectCreator> {
     super.initState();
   }
 
-  int selectedFilesIndex = -1;
-  final TextEditingController _HeadingFilesController = TextEditingController();
-  final TextEditingController _DataFilesController = TextEditingController();
-  final TextEditingController _TypeFilesController = TextEditingController();
-
-  // void addFiles() {
-  //   setState(() {
-  //     appAndPlatforms.add(ConvertorForTRCSRC(
-  //         heading: _HeadingFilesController.text,
-  //         path: _TypeFilesController.text, IVF:
-  //     ));
-  //     _HeadingFilesController.clear();
-  //     _DataFilesController.clear();
-  //     _TypeFilesController.clear();
-  //   });
-  // }
-  //
-  // void editFiles(int index) {
-  //   setState(() {
-  //     selectedFilesIndex = index;
-  //     _HeadingFilesController.text = appAndPlatforms[index].heading;
-  //     _DataFilesController.text = appAndPlatforms[index].image;
-  //     _TypeFilesController.text = appAndPlatforms[index].path;
-  //   });
-  // }
-
-  // void saveFiles() {
-  //   if (selectedFilesIndex != -1) {
-  //     setState(() {
-  //       items[selectedFilesIndex].heading = _HeadingFilesController.text;
-  //       items[selectedFilesIndex].image = _DataFilesController.text;
-  //       items[selectedFilesIndex].link = _TypeFilesController.text;
-  //
-  //       _HeadingFilesController.clear();
-  //       _DataFilesController.clear();
-  //       _TypeFilesController.clear();
-  //
-  //       selectedFilesIndex = -1;
-  //     });
-  //   }
-  // }
   bool isFree = true;
   bool isContainsAds = true;
+  List<YoutubeConvertor> youtubeData = [];
+  final YoutubeLinkController = TextEditingController();
+
   List<DescriptionConvertor> descriptionList = [];
+
   List<ConvertorForTRCSRC> ComponentsAndSupplies = [];
-  final TextEditingController Heading_ConvertorForTRCSRC_Controller =
-      TextEditingController();
-  final TextEditingController PathName_ConvertorForTRCSRC_Controller =
-      TextEditingController();
-  final TextEditingController PathId_ConvertorForTRCSRC_Controller =
-      TextEditingController();
-  IVFUploader? IVF_ComponentsAndSupplies;
-
-  List<ConvertorForTRCSRC> appAndPlatforms = [];
-
-  IVFUploader? IVF_appAndPlatforms;
-  int selectedConvertorForTRCSRC = -1;
+  final TextEditingController Heading_ComponentsAndSupplies_Controller =
+  TextEditingController();
+  final TextEditingController PathName_ComponentsAndSupplies_Controller =
+  TextEditingController();
+  final TextEditingController PathId_ComponentsAndSupplies_Controller =
+  TextEditingController();
 
   List<ConvertorForTRCSRC> toolsRequired = [];
+  final TextEditingController Heading_toolsRequired_Controller =
+  TextEditingController();
+  final TextEditingController PathName_toolsRequired_Controller =
+  TextEditingController();
+  final TextEditingController PathId_toolsRequired_Controller =
+  TextEditingController();
 
-  IVFUploader? IVF_toolsRequired;
-  int selectedImageIndex = -1;
+  List<ConvertorForTRCSRC> appAndPlatforms = [];
+  final TextEditingController Heading_appAndPlatforms_Controller =
+  TextEditingController();
+  final TextEditingController PathName_appAndPlatforms_Controller =
+  TextEditingController();
+  final TextEditingController PathId_appAndPlatforms_Controller =
+  TextEditingController();
+  FileUploader? IVF_ConvertorForTRCSRC;
+  int selectedConvertorForTRCSRC = -1;
+
 
   List<String> tableOfContentList = [];
-  final TextEditingController _tableOfContentController =
-      TextEditingController();
-  int selectedtableOfContentIndex = -1;
+  final tableOfContentController = TextEditingController();
+  int selectedTableOfContentIndex = -1;
 
   List<String> TagsList = [];
   final TextEditingController _TagsController = TextEditingController();
   int selectedTagsIndex = -1;
-
-  void addTags() {
-    String points = _TagsController.text;
-    if (points.isNotEmpty) {
-      setState(() {
-        TagsList.add(points);
-        _TagsController.clear();
-      });
-    }
-  }
-
-  void editTags(int index) {
-    setState(() {
-      selectedTagsIndex = index;
-      _TagsController.text = TagsList[index];
-    });
-  }
-
-  void saveTags() {
-    String editedImage = _TagsController.text;
-    if (editedImage.isNotEmpty && selectedTagsIndex != -1) {
-      setState(() {
-        TagsList[selectedImageIndex] = editedImage;
-        _TagsController.clear();
-        selectedTagsIndex = -1;
-      });
-    }
-  }
-
-  void deleteTags(int index) {
-    setState(() {
-      TagsList.removeAt(index);
-      if (selectedTagsIndex == index) {
-        selectedTagsIndex = -1;
-        _TagsController.clear();
-      }
-    });
-  }
-
-  void moveTagsUp(int index) {
-    if (index > 0) {
-      setState(() {
-        String point = TagsList.removeAt(index);
-        TagsList.insert(index - 1, point);
-        if (selectedTagsIndex == index) {
-          selectedTagsIndex--;
-        }
-      });
-    }
-  }
-
-  void moveTagsDown(int index) {
-    if (index < TagsList.length - 1) {
-      setState(() {
-        String Image = TagsList.removeAt(index);
-        TagsList.insert(index + 1, Image);
-        if (selectedTagsIndex == index) {
-          selectedTagsIndex++;
-        }
-      });
-    }
-  }
-
-  void addtableOfContent() {
-    String points = _tableOfContentController.text;
-    if (points.isNotEmpty) {
-      setState(() {
-        tableOfContentList.add(points);
-        _tableOfContentController.clear();
-      });
-    }
-  }
-
-  void edittableOfContent(int index) {
-    setState(() {
-      selectedtableOfContentIndex = index;
-      _tableOfContentController.text = tableOfContentList[index];
-    });
-  }
-
-  void savetableOfContent() {
-    String editedImage = _tableOfContentController.text;
-    if (editedImage.isNotEmpty && selectedtableOfContentIndex != -1) {
-      setState(() {
-        tableOfContentList[selectedtableOfContentIndex] = editedImage;
-        _tableOfContentController.clear();
-        selectedtableOfContentIndex = -1;
-      });
-    }
-  }
-
-  void deletetableOfContent(int index) {
-    setState(() {
-      tableOfContentList.removeAt(index);
-      if (selectedtableOfContentIndex == index) {
-        selectedtableOfContentIndex = -1;
-        _tableOfContentController.clear();
-      }
-    });
-  }
-
-  void movetableOfContentUp(int index) {
-    if (index > 0) {
-      setState(() {
-        String point = tableOfContentList.removeAt(index);
-        tableOfContentList.insert(index - 1, point);
-        if (selectedtableOfContentIndex == index) {
-          selectedtableOfContentIndex--;
-        }
-      });
-    }
-  }
-
-  void movetableOfContentDown(int index) {
-    if (index < tableOfContentList.length - 1) {
-      setState(() {
-        String Image = tableOfContentList.removeAt(index);
-        tableOfContentList.insert(index + 1, Image);
-        if (selectedtableOfContentIndex == index) {
-          selectedtableOfContentIndex++;
-        }
-      });
-    }
-  }
+  int selectedYoutubeIndex = -1;
 
   @override
   Widget build(BuildContext context) {
@@ -265,305 +114,400 @@ class _ProjectCreatorState extends State<ProjectCreator> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             backButton(),
-            const Padding(
-              padding: EdgeInsets.only(left: 15, top: 8),
-              child: Text(
-                "Project Heading",
-                style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black),
-              ),
+            HeadingH1(heading: "Project Creator"),
+
+            TextFieldContainer(
+              controller: HeadingFirstController,
+              hintText: 'Short Heading',
+
+
+              heading: "Short Heading",
             ),
             TextFieldContainer(
-              child: TextFormField(
-                controller: HeadingFirstController,
-                textInputAction: TextInputAction.next,
-                style: TextStyle(color: Colors.black, fontSize: 20),
-                decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintText: 'Short Heading',
-                    hintStyle: TextStyle(color: Colors.black54)),
-              ),
+              controller: HeadingLastController,
+              hintText: 'Full Heading',
+
+
+              heading: "Long Heading",
             ),
-            TextFieldContainer(
-              child: TextFormField(
-                controller: HeadingLastController,
-                textInputAction: TextInputAction.next,
-                style: TextStyle(color: Colors.black, fontSize: 20),
-                decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintText: 'Full Heading',
-                    hintStyle: TextStyle(color: Colors.black54)),
-              ),
-            ),
-            Uploader(
-              type: FileType.image,
-              path: "projects",
-              allowMultiple: true,
-              getIVF: (data) {
-                setState(() {
-                  iv = data;
-                });
-              },
-              ivf: iv,
-            ),
-            TextFieldContainer(
-              child: TextFormField(
-                controller: TypeController,
-                textInputAction: TextInputAction.next,
-                style: TextStyle(color: Colors.black, fontSize: 20),
-                decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintText: 'Projects Type',
-                    hintStyle: TextStyle(color: Colors.black54)),
-              ),
-            ),
-            TextFieldContainer(
-              child: TextFormField(
-                controller: YoutubeLinkController,
-                textInputAction: TextInputAction.next,
-                style: TextStyle(color: Colors.black, fontSize: 20),
-                decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintText: 'Youtube Link',
-                    hintStyle: TextStyle(color: Colors.black54)),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 15, top: 8),
-              child: Text(
-                "Tags",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
-              ),
-            ),
-            ListView.builder(
-              padding: EdgeInsets.zero,
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: TagsList.length,
-              shrinkWrap: true,
-              itemBuilder: (context, index) {
-                return Dismissible(
-                  key: Key(TagsList[index]),
-                  background: Container(
-                    color: Colors.red,
-                    alignment: Alignment.centerRight,
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Icon(
-                      Icons.delete,
-                      color: Colors.black,
-                    ),
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+              decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10)),
+              child: Column(
+                children: [
+                  HeadingWithDivider(heading: "Thumbnail"),
+                  if(IVF_Thumbnail!=null)SizedBox(height: 100,width: 150,child: Image.network(IVF_Thumbnail!.fileUrl),),
+                  Uploader(
+
+                    type: FileType.image,
+                    path: "projects",
+
+                    getIVF: (data) {
+                      setState(() {
+                        IVF_Thumbnail = data.first;
+                      });
+                    },
+                    IVF: IVF_Thumbnail!=null?[IVF_Thumbnail!]:[],
                   ),
-                  direction: DismissDirection.endToStart,
-                  onDismissed: (direction) {
-                    deleteTags(index);
-                  },
-                  child: ListTile(
-                    title: Text(
-                      TagsList[index],
-                      style: TextStyle(
-                          color: Colors.black87,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500),
-                    ),
-                    trailing: SingleChildScrollView(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          IconButton(
-                            icon: Icon(Icons.delete),
-                            onPressed: () {
-                              deleteTags(index);
-                            },
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.edit),
-                            onPressed: () {
-                              editTags(index);
-                            },
-                          ),
-                          InkWell(
-                            child: Icon(
-                              Icons.move_up,
-                              size: 30,
+                ],
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+              decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10)),
+              child: Column(
+                children: [
+                  HeadingWithDivider(heading: "Other Images"),
+                  Uploader(
+                    type: FileType.image,
+                    path: "projects",
+                    allowMultiple: true,
+                    getIVF: (data) {
+                      setState(() {
+                        IVF_Images = data;
+                      });
+                    },
+                    IVF: IVF_Images,
+                  ),
+                ],
+              ),
+            ),
+
+            TextFieldContainer(
+              controller: TypeController,
+              hintText: 'Projects Type',
+
+
+              heading: "Projects Type",
+            ),
+
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+              decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10)),
+              child: Column(
+                children: [
+                  HeadingWithDivider(heading: "YouTube"),
+                  ReorderableListView(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    padding: EdgeInsets.only(left: 10, right: 10, bottom: 1),
+                    children: List.generate(
+                      youtubeData.length,
+                          (index) =>
+                          Container(
+                            key: ValueKey(index),
+                            // Assign a unique key to each item
+                            padding: EdgeInsets.symmetric(
+                                vertical: 5, horizontal: 10),
+                            margin: EdgeInsets.symmetric(vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.white10,
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            onTap: () {
-                              moveTagsUp(index);
-                            },
-                            onDoubleTap: () {
-                              moveTagsDown(index);
-                            },
+                            child: Row(
+                              children: [
+                                Expanded(child: Text(youtubeData[index].video_url,style: TextStyle(color: Colors.white),)),
+                                InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        selectedYoutubeIndex = index;
+                                        YoutubeLinkController.text = youtubeData[index].video_url;
+                                      });
+                                    },
+                                    child: Padding(
+                                      padding:
+                                      const EdgeInsets.symmetric(
+                                          horizontal: 10.0),
+                                      child: Icon(Icons.edit),
+                                    )),
+                                InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        youtubeData.removeAt(index);
+                                      });
+                                    },
+                                    child: Icon(Icons.delete,color: Colors.orangeAccent,)),
+                              ],
+                            ),
                           ),
-                        ],
-                      ),
                     ),
-                    onTap: () {
-                      editTags(index);
+                    onReorder: (int oldIndex, int newIndex) {
+                      setState(() {
+                        if (oldIndex < newIndex) {
+                          newIndex -= 1;
+                        }
+
+                        youtubeData.insert(newIndex, youtubeData.removeAt(oldIndex));
+                      });
                     },
                   ),
-                );
-              },
+                  Row(
+                    children: [
+                      Flexible(
+                        child: TextFieldContainer(
+                          controller: YoutubeLinkController,
+                          hintText: 'Enter Youtube Videos Urls',
+
+                        ),
+                      ),
+                      InkWell(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 5, horizontal: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.black12,
+                            border: Border.all(color: Colors.white),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Text(
+                            selectedYoutubeIndex >= 0 ? "Save" : "Add",
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        ),
+                        onTap: () {
+                          setState(() {
+                            if (selectedYoutubeIndex >= 0) {
+                              youtubeData[selectedYoutubeIndex] =YoutubeConvertor(video_url: YoutubeLinkController.text, heading: "Neo Pixel LEDs lighting", note: "This is the First video must be watch for more connects", thumbnail_url: "");
+                            } else {
+                              youtubeData.add(YoutubeConvertor(video_url: YoutubeLinkController.text, heading: "", note: "", thumbnail_url: ""));
+                            }
+                          });
+                          selectedYoutubeIndex = -1;
+                          YoutubeLinkController.clear();
+                        },
+                      )
+                    ],
+                  ),
+
+                ],
+              ),
             ),
-            Row(
-              children: [
-                Flexible(
-                  child: TextFieldContainer(
-                    child: TextFormField(
-                      controller: _TagsController,
-                      style: TextStyle(color: Colors.black),
-                      keyboardType: TextInputType.multiline,
-                      maxLines: null,
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+              decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10)),
+              child: Column(
+                children: [
+                  HeadingWithDivider(heading: "Tags"),
+                  ReorderableListView(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    padding: EdgeInsets.only(left: 10, right: 10, bottom: 1),
+                    children: List.generate(
+                      TagsList.length,
+                          (index) =>
+                          Container(
+                            key: ValueKey(index),
+                            // Assign a unique key to each item
+                            padding: EdgeInsets.symmetric(
+                                vertical: 5, horizontal: 10),
+                            margin: EdgeInsets.symmetric(vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(child: Text(TagsList[index])),
+                                InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        selectedTagsIndex = index;
+                                        _TagsController.text = TagsList[index];
+                                      });
+                                    },
+                                    child: Padding(
+                                      padding:
+                                      const EdgeInsets.symmetric(
+                                          horizontal: 10.0),
+                                      child: Icon(Icons.edit),
+                                    )),
+                                InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        TagsList.removeAt(index);
+                                      });
+                                    },
+                                    child: Icon(Icons.delete)),
+                              ],
+                            ),
+                          ),
+                    ),
+                    onReorder: (int oldIndex, int newIndex) {
+                      setState(() {
+                        if (oldIndex < newIndex) {
+                          newIndex -= 1;
+                        }
+
+                        TagsList.insert(newIndex, TagsList.removeAt(oldIndex));
+                      });
+                    },
+                  ),
+                  Row(
+                    children: [
+                      Flexible(
+                        child: TextFieldContainer(
+                          controller: _TagsController,
                           hintText: 'Enter Tags Here',
-                          hintStyle: TextStyle(color: Colors.black),
-                          hoverColor: Colors.black,
-                          labelStyle: TextStyle(color: Colors.black)),
-                    ),
+                        ),
+                      ),
+                      InkWell(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 5, horizontal: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.black12,
+                            border: Border.all(color: Colors.white),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Text(
+                            selectedTagsIndex >= 0 ? "Save" : "Add",
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        ),
+                        onTap: () {
+                          setState(() {
+                            if (selectedTagsIndex >= 0) {
+                              TagsList[selectedTagsIndex] =
+                                  _TagsController.text;
+                            } else {
+                              TagsList.add(_TagsController.text);
+                            }
+                          });
+                          selectedTagsIndex = -1;
+                          _TagsController.clear();
+                        },
+                      )
+                    ],
                   ),
-                ),
-                InkWell(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white12,
-                      border: Border.all(color: Colors.white),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Icon(
-                      Icons.add,
-                      size: 45,
-                    ),
-                  ),
-                  onTap: () {
-                    addTags();
-                  },
-                )
-              ],
+
+                ],
+              ),
             ),
+
             TextFieldContainer(
               heading: "About Project",
-              child: TextFormField(
-                controller: DescriptionController,
-                textInputAction: TextInputAction.next,
-                style: TextStyle(color: Colors.black, fontSize: 20),
-                decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintText: 'Description',
-                    hintStyle: TextStyle(color: Colors.black54)),
-              ),
+              controller: DescriptionController,
+              hintText: 'Description',
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 15, top: 8),
-              child: Text(
-                "Table Of Content",
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            ListView.builder(
-              padding: EdgeInsets.zero,
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: tableOfContentList.length,
-              shrinkWrap: true,
-              itemBuilder: (context, index) {
-                return Dismissible(
-                  key: Key(tableOfContentList[index]),
-                  background: Container(
-                    color: Colors.red,
-                    alignment: Alignment.centerRight,
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Icon(
-                      Icons.delete,
-                      color: Colors.white,
-                    ),
-                  ),
-                  direction: DismissDirection.endToStart,
-                  onDismissed: (direction) {
-                    deletetableOfContent(index);
-                  },
-                  child: ListTile(
-                    title: Text(
-                      tableOfContentList[index],
-                      style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500),
-                    ),
-                    trailing: SingleChildScrollView(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          IconButton(
-                            icon: Icon(Icons.delete),
-                            onPressed: () {
-                              deletetableOfContent(index);
-                            },
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.edit),
-                            onPressed: () {
-                              edittableOfContent(index);
-                            },
-                          ),
-                          InkWell(
-                            child: Icon(
-                              Icons.move_up,
-                              size: 30,
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+              decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10)),
+              child: Column(
+                children: [
+                  HeadingWithDivider(heading: "Table Of Content"),
+                  ReorderableListView(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    padding: EdgeInsets.only(left: 10, right: 10, bottom: 1),
+                    children: List.generate(
+                      tableOfContentList.length,
+                          (index) =>
+                          Container(
+                            key: ValueKey(index),
+                            // Assign a unique key to each item
+                            padding: EdgeInsets.symmetric(
+                                vertical: 5, horizontal: 10),
+                            margin: EdgeInsets.symmetric(vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            onTap: () {
-                              movetableOfContentUp(index);
-                            },
-                            onDoubleTap: () {
-                              movetableOfContentDown(index);
-                            },
+                            child: Row(
+                              children: [
+                                Expanded(
+                                    child: Text(tableOfContentList[index])),
+                                InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        selectedTableOfContentIndex = index;
+                                        tableOfContentController.text =
+                                        tableOfContentList[index];
+                                      });
+                                    },
+                                    child: Padding(
+                                      padding:
+                                      const EdgeInsets.symmetric(
+                                          horizontal: 10.0),
+                                      child: Icon(Icons.edit),
+                                    )),
+                                InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        tableOfContentList.removeAt(index);
+                                      });
+                                    },
+                                    child: Icon(Icons.delete)),
+                              ],
+                            ),
                           ),
-                        ],
-                      ),
                     ),
-                    onTap: () {
-                      edittableOfContent(index);
+                    onReorder: (int oldIndex, int newIndex) {
+                      setState(() {
+                        if (oldIndex < newIndex) {
+                          newIndex -= 1;
+                        }
+                        tableOfContentList.insert(newIndex, tableOfContentList
+                            .removeAt(oldIndex));
+                      });
                     },
                   ),
-                );
-              },
-            ),
-            Row(
-              children: [
-                Flexible(
-                  child: TextFieldContainer(
-                    child: TextFormField(
-                      controller: _tableOfContentController,
-                      style: TextStyle(color: Colors.black),
-                      keyboardType: TextInputType.multiline,
-                      maxLines: null,
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: 'Enter tableOfContent Here',
-                          hintStyle: TextStyle(color: Colors.black),
-                          hoverColor: Colors.black,
-                          labelStyle: TextStyle(color: Colors.black)),
-                    ),
+
+
+                  Row(
+                    children: [
+                      Flexible(
+                        child: TextFieldContainer(
+                          controller: tableOfContentController,
+                          hintText: 'Enter Tags Here',
+                        ),
+                      ),
+                      InkWell(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 5, horizontal: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.black12,
+                            border: Border.all(color: Colors.white),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Text(
+                            selectedTableOfContentIndex >= 0 ? "Save" : "Add",
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        ),
+                        onTap: () {
+                          setState(() {
+                            if (selectedTableOfContentIndex >= 0) {
+                              tableOfContentList[selectedTableOfContentIndex] =
+                                  tableOfContentController.text;
+                            } else {
+                              tableOfContentList.add(
+                                  tableOfContentController.text);
+                            }
+                          });
+                          selectedTableOfContentIndex = -1;
+                          tableOfContentController.clear();
+                        },
+                      )
+                    ],
                   ),
-                ),
-                InkWell(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white12,
-                      border: Border.all(color: Colors.white),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Icon(
-                      Icons.add,
-                      size: 45,
-                    ),
-                  ),
-                  onTap: () {
-                    addtableOfContent();
-                  },
-                )
-              ],
+                ],
+              ),
             ),
             Container(
               margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
@@ -586,30 +530,32 @@ class _ProjectCreatorState extends State<ProjectCreator> {
                     padding: EdgeInsets.only(left: 10, right: 10, bottom: 1),
                     children: List.generate(
                       descriptionList.length,
-                      (index) => Container(
-                        key: ValueKey(index),
-                        // Assign a unique key to each item
-                        padding:
+                          (index) =>
+                          Container(
+                            key: ValueKey(index),
+                            // Assign a unique key to each item
+                            padding:
                             EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                        margin: EdgeInsets.symmetric(vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                                child: Text(descriptionList[index].heading)),
-                            InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    descriptionList.removeAt(index);
-                                  });
-                                },
-                                child: Icon(Icons.delete))
-                          ],
-                        ),
-                      ),
+                            margin: EdgeInsets.symmetric(vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                    child: Text(
+                                        descriptionList[index].heading)),
+                                InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        descriptionList.removeAt(index);
+                                      });
+                                    },
+                                    child: Icon(Icons.delete))
+                              ],
+                            ),
+                          ),
                     ),
                     onReorder: (int oldIndex, int newIndex) {
                       setState(() {
@@ -617,7 +563,7 @@ class _ProjectCreatorState extends State<ProjectCreator> {
                           newIndex -= 1;
                         }
                         final DescriptionConvertor item =
-                            descriptionList.removeAt(oldIndex);
+                        descriptionList.removeAt(oldIndex);
                         descriptionList.insert(newIndex, item);
                       });
                     },
@@ -625,40 +571,35 @@ class _ProjectCreatorState extends State<ProjectCreator> {
                 ],
               ),
             ),
+
+
             Container(
               margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-              color: Colors.white,
+              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+              decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10)),
               child: Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 15, top: 8),
-                    child: Text(
-                      "Components And Supplies",
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
+                  HeadingWithDivider(heading: "Components And Supplies"),
                   ReorderableListView(
                     physics: NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
-                    padding: EdgeInsets.only(left: 10, right: 10, bottom: 1),
                     children: List.generate(
                       ComponentsAndSupplies.length,
-                      (index) => Container(
-                        key: ValueKey(index),
-                        // Assign a unique key to each item
-                        padding:
-                            EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                        margin: EdgeInsets.symmetric(vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: convertorForTRCSRCContainer(
-                            ComponentsAndSupplies[index], 0, index),
-                      ),
+                          (index) =>
+                          Container(
+                            key: ValueKey(index),
+                            // Assign a unique key to each item
+                            padding: EdgeInsets.symmetric(vertical: 5),
+                            margin: EdgeInsets.symmetric(vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: convertorForTRCSRCContainer(
+                                ComponentsAndSupplies[index], 1, index),
+                          ),
                     ),
                     onReorder: (int oldIndex, int newIndex) {
                       setState(() {
@@ -666,86 +607,118 @@ class _ProjectCreatorState extends State<ProjectCreator> {
                           newIndex -= 1;
                         }
                         final ConvertorForTRCSRC item =
-                            ComponentsAndSupplies.removeAt(oldIndex);
+                        ComponentsAndSupplies.removeAt(oldIndex);
                         ComponentsAndSupplies.insert(newIndex, item);
                       });
                     },
                   ),
                   Column(
                     children: [
+                      TextFieldContainer(
+                          heading: "Heading",
+                          controller: Heading_ComponentsAndSupplies_Controller,
+                          hintText: 'Heading',
+                      ),
                       Row(
                         children: [
-                          Flexible(
-                            flex: 5,
+                          Expanded(
                             child: TextFieldContainer(
-                                heading: "Heading",
-                                child: TextFormField(
-                                  controller: _HeadingFilesController,
-                                  textInputAction: TextInputAction.next,
-                                  style: TextStyle(color: Colors.black),
-                                  decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      hintText: 'Heading',
-                                      hintStyle:
-                                          TextStyle(color: Colors.black)),
-                                )),
+                                heading: "Path Name",
+                                controller:
+                                PathName_ComponentsAndSupplies_Controller,
+                                hintText: 'name',
+                            ),
                           ),
-                          Flexible(
-                            flex: 2,
+                          Expanded(
                             child: TextFieldContainer(
-                                heading: "Type",
-                                child: TextFormField(
-                                  controller: _TypeFilesController,
-                                  textInputAction: TextInputAction.next,
-                                  style: TextStyle(color: Colors.black),
-                                  decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      hintText: 'type',
-                                      hintStyle:
-                                          TextStyle(color: Colors.black)),
-                                )),
+                                heading: "Path Id",
+                                hintText: 'Id',
+                                controller:
+                                PathId_ComponentsAndSupplies_Controller,
+                                ),
                           ),
                         ],
                       ),
                       Row(
                         children: [
-                          Flexible(
-                            child: TextFieldContainer(
-                                heading: "Data",
-                                child: TextFormField(
-                                  controller: _DataFilesController,
-                                  textInputAction: TextInputAction.next,
-                                  style: TextStyle(color: Colors.black),
-                                  maxLines: null,
-                                  decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      hintText: 'data',
-                                      hintStyle:
-                                          TextStyle(color: Colors.black)),
-                                )),
-                          ),
+                          Expanded(
+                              child: Uploader(
+                                type: FileType.any,
+                                path: "project",
+                                getIVF: (IVFData) {
+                                  setState(() {
+                                    IVF_ConvertorForTRCSRC = IVFData.first;
+                                  });
+                                },
+                              )),
                           InkWell(
                             child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 5, horizontal: 10),
                               decoration: BoxDecoration(
-                                color: Colors.white12,
+                                color: Colors.black12,
                                 border: Border.all(color: Colors.white),
                                 borderRadius: BorderRadius.circular(14),
                               ),
-                              child: Icon(
-                                Icons.add,
-                                size: 45,
+                              child: Text(
+                                selectedConvertorForTRCSRC >= 0
+                                    ? "Save"
+                                    : "Add",
+                                style: TextStyle(fontSize: 20),
                               ),
                             ),
                             onTap: () {
                               setState(() {
-                                // ComponentsAndSupplies.add(ConvertorForTRCSRC(
-                                //     heading: _HeadingFilesController.text,
-                                //     image: _DataFilesController.text,
-                                //     path: _TypeFilesController.text));
-                                _HeadingFilesController.clear();
-                                _DataFilesController.clear();
-                                _TypeFilesController.clear();
+                                if (selectedConvertorForTRCSRC >= 0) {
+                                  ComponentsAndSupplies[selectedConvertorForTRCSRC] =
+                                      ConvertorForTRCSRC(
+                                          heading:
+                                          Heading_ComponentsAndSupplies_Controller
+                                              .text,
+                                          path: Path(
+                                              path:
+                                              PathName_ComponentsAndSupplies_Controller
+                                                  .text,
+                                              id: PathId_ComponentsAndSupplies_Controller
+                                                  .text),
+                                          ivf: IVF_ConvertorForTRCSRC != null
+                                              ? IVF_ConvertorForTRCSRC!
+                                              : FileUploader(
+                                              type: "",
+                                              fileUrl: "",
+                                              fileName: "",
+                                              size: "",
+                                              fileMessageId: 0,
+                                              thumbnailUrl: "",
+                                              thumbnailMessageId: 0));
+                                } else
+                                  ComponentsAndSupplies.add(ConvertorForTRCSRC(
+                                      heading:
+                                      Heading_ComponentsAndSupplies_Controller
+                                          .text,
+                                      path: Path(
+                                          path:
+                                          PathName_ComponentsAndSupplies_Controller
+                                              .text,
+                                          id: PathId_ComponentsAndSupplies_Controller
+                                              .text),
+                                      ivf: IVF_ConvertorForTRCSRC != null
+                                          ? IVF_ConvertorForTRCSRC!
+                                          : FileUploader(
+                                          type: "",
+                                          fileUrl: "",
+                                          fileName: "",
+                                          size: "",
+                                          fileMessageId: 0,
+                                          thumbnailUrl: "",
+                                          thumbnailMessageId: 0)));
+                                selectedConvertorForTRCSRC = -1;
+                                IVF_ConvertorForTRCSRC = null;
                               });
+
+                              Heading_ComponentsAndSupplies_Controller.clear();
+                              PathName_ComponentsAndSupplies_Controller.clear();
+                              PathId_ComponentsAndSupplies_Controller.clear();
                             },
                           )
                         ],
@@ -757,38 +730,31 @@ class _ProjectCreatorState extends State<ProjectCreator> {
             ),
             Container(
               margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-              color: Colors.white,
+              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+              decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10)),
               child: Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 15, top: 8),
-                    child: Text(
-                      "Tools Required",
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
+                  HeadingWithDivider(heading: "Tools Required"),
                   ReorderableListView(
                     physics: NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
-                    padding: EdgeInsets.only(left: 10, right: 10, bottom: 1),
                     children: List.generate(
                       toolsRequired.length,
-                      (index) => Container(
-                        key: ValueKey(index),
-                        // Assign a unique key to each item
-                        padding:
-                            EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                        margin: EdgeInsets.symmetric(vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: convertorForTRCSRCContainer(
-                            toolsRequired[index], 0, index),
-                      ),
+                          (index) =>
+                          Container(
+                            key: ValueKey(index),
+                            // Assign a unique key to each item
+                            padding: EdgeInsets.symmetric(vertical: 5),
+                            margin: EdgeInsets.symmetric(vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: convertorForTRCSRCContainer(
+                                toolsRequired[index], 2, index),
+                          ),
                     ),
                     onReorder: (int oldIndex, int newIndex) {
                       setState(() {
@@ -796,86 +762,120 @@ class _ProjectCreatorState extends State<ProjectCreator> {
                           newIndex -= 1;
                         }
                         final ConvertorForTRCSRC item =
-                            toolsRequired.removeAt(oldIndex);
+                        toolsRequired.removeAt(oldIndex);
                         toolsRequired.insert(newIndex, item);
                       });
                     },
                   ),
                   Column(
                     children: [
+                      TextFieldContainer(
+                          heading: "Heading",
+                          controller: Heading_toolsRequired_Controller,
+                          hintText: 'Heading',
+
+                          ),
                       Row(
                         children: [
-                          Flexible(
-                            flex: 5,
+                          Expanded(
                             child: TextFieldContainer(
-                                heading: "Heading",
-                                child: TextFormField(
-                                  controller: _HeadingFilesController,
-                                  textInputAction: TextInputAction.next,
-                                  style: TextStyle(color: Colors.black),
-                                  decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      hintText: 'Heading',
-                                      hintStyle:
-                                          TextStyle(color: Colors.black)),
-                                )),
+                                heading: "Path Name",
+                                controller:
+                                PathName_toolsRequired_Controller,
+                                hintText: 'name',
+                                ),
                           ),
-                          Flexible(
-                            flex: 2,
+                          Expanded(
                             child: TextFieldContainer(
-                                heading: "Type",
-                                child: TextFormField(
-                                  controller: _TypeFilesController,
-                                  textInputAction: TextInputAction.next,
-                                  style: TextStyle(color: Colors.black),
-                                  decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      hintText: 'type',
-                                      hintStyle:
-                                          TextStyle(color: Colors.black)),
-                                )),
+                                controller:
+                                PathId_toolsRequired_Controller,
+                                heading: "Path Id",
+                                hintText: 'Id',
+
+                                ),
                           ),
                         ],
                       ),
                       Row(
                         children: [
-                          Flexible(
-                            child: TextFieldContainer(
-                                heading: "Data",
-                                child: TextFormField(
-                                  controller: _DataFilesController,
-                                  textInputAction: TextInputAction.next,
-                                  style: TextStyle(color: Colors.black),
-                                  maxLines: null,
-                                  decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      hintText: 'data',
-                                      hintStyle:
-                                          TextStyle(color: Colors.black)),
-                                )),
-                          ),
+                          Expanded(
+                              child: Uploader(
+                                type: FileType.any,
+                                path: "project",
+                                getIVF: (IVFData) {
+                                  setState(() {
+                                    IVF_ConvertorForTRCSRC = IVFData.first;
+                                  });
+                                },
+                              )),
                           InkWell(
                             child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 5, horizontal: 10),
                               decoration: BoxDecoration(
-                                color: Colors.white12,
+                                color: Colors.black12,
                                 border: Border.all(color: Colors.white),
                                 borderRadius: BorderRadius.circular(14),
                               ),
-                              child: Icon(
-                                Icons.add,
-                                size: 45,
+                              child: Text(
+                                selectedConvertorForTRCSRC >= 0
+                                    ? "Save"
+                                    : "Add",
+                                style: TextStyle(fontSize: 20),
                               ),
                             ),
                             onTap: () {
-                              // setState(() {
-                              //   toolsRequired.add(ConvertorForTRCSRC(
-                              //       heading: _HeadingFilesController.text,
-                              //
-                              //       path: _TypeFilesController.text, IVF: IVFUploader(type: "", file_url: "", size: "", file_messageId: 0, thumbnail_url: "", thumbnail_messageId: 0)));
-                              //   _HeadingFilesController.clear();
-                              //   _DataFilesController.clear();
-                              //   _TypeFilesController.clear();
-                              // });
+                              setState(() {
+                                if (selectedConvertorForTRCSRC >= 0) {
+                                  toolsRequired[selectedConvertorForTRCSRC] =
+                                  ConvertorForTRCSRC(
+                                      heading:
+                                      Heading_toolsRequired_Controller
+                                          .text,
+                                      path: Path(
+                                          path:
+                                          PathName_toolsRequired_Controller
+                                              .text,
+                                          id: PathId_toolsRequired_Controller
+                                              .text),
+                                      ivf: IVF_ConvertorForTRCSRC != null
+                                          ? IVF_ConvertorForTRCSRC!
+                                          : FileUploader(
+                                          type: "",
+                                          fileUrl: "",
+                                          fileName: "",
+                                          size: "",
+                                          fileMessageId: 0,
+                                          thumbnailUrl: "",
+                                          thumbnailMessageId: 0));
+                                } else
+                                  toolsRequired.add(ConvertorForTRCSRC(
+                                      heading:
+                                      Heading_toolsRequired_Controller
+                                          .text,
+                                      path: Path(
+                                          path:
+                                          PathName_toolsRequired_Controller
+                                              .text,
+                                          id: PathId_toolsRequired_Controller
+                                              .text),
+                                      ivf: IVF_ConvertorForTRCSRC != null
+                                          ? IVF_ConvertorForTRCSRC!
+                                          : FileUploader(
+                                          type: "",
+                                          fileUrl: "",
+                                          fileName: "",
+                                          size: "",
+                                          fileMessageId: 0,
+                                          thumbnailUrl: "",
+                                          thumbnailMessageId: 0)));
+                                selectedConvertorForTRCSRC = -1;
+                                IVF_ConvertorForTRCSRC = null;
+                              });
+
+                              Heading_toolsRequired_Controller.clear();
+                              PathName_toolsRequired_Controller.clear();
+                              PathId_toolsRequired_Controller.clear();
                             },
                           )
                         ],
@@ -899,18 +899,19 @@ class _ProjectCreatorState extends State<ProjectCreator> {
                     shrinkWrap: true,
                     children: List.generate(
                       appAndPlatforms.length,
-                      (index) => Container(
-                        key: ValueKey(index),
-                        // Assign a unique key to each item
-                        padding: EdgeInsets.symmetric(vertical: 5),
-                        margin: EdgeInsets.symmetric(vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: convertorForTRCSRCContainer(
-                            appAndPlatforms[index], 2, index),
-                      ),
+                          (index) =>
+                          Container(
+                            key: ValueKey(index),
+                            // Assign a unique key to each item
+                            padding: EdgeInsets.symmetric(vertical: 5),
+                            margin: EdgeInsets.symmetric(vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: convertorForTRCSRCContainer(
+                                appAndPlatforms[index], 0, index),
+                          ),
                     ),
                     onReorder: (int oldIndex, int newIndex) {
                       setState(() {
@@ -918,7 +919,7 @@ class _ProjectCreatorState extends State<ProjectCreator> {
                           newIndex -= 1;
                         }
                         final ConvertorForTRCSRC item =
-                            appAndPlatforms.removeAt(oldIndex);
+                        appAndPlatforms.removeAt(oldIndex);
                         appAndPlatforms.insert(newIndex, item);
                       });
                     },
@@ -927,46 +928,27 @@ class _ProjectCreatorState extends State<ProjectCreator> {
                     children: [
                       TextFieldContainer(
                           heading: "Heading",
-                          child: TextFormField(
-                            controller: Heading_ConvertorForTRCSRC_Controller,
-                            textInputAction: TextInputAction.next,
-                            style: TextStyle(color: Colors.black),
-                            decoration: InputDecoration(
-                                border: InputBorder.none,
-                                hintText: 'Heading',
-                                hintStyle: TextStyle(color: Colors.black)),
-                          )),
+                          controller: Heading_appAndPlatforms_Controller,
+                          hintText: 'Heading',
+
+                      ),
                       Row(
                         children: [
                           Expanded(
                             child: TextFieldContainer(
                                 heading: "Path Name",
-                                child: TextFormField(
-                                  controller:
-                                      PathName_ConvertorForTRCSRC_Controller,
-                                  textInputAction: TextInputAction.next,
-                                  style: TextStyle(color: Colors.black),
-                                  decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      hintText: 'name',
-                                      hintStyle:
-                                          TextStyle(color: Colors.black)),
-                                )),
+                                controller:
+                                PathName_appAndPlatforms_Controller,
+                                hintText: 'name',
+                            ),
                           ),
                           Expanded(
                             child: TextFieldContainer(
+                                controller:
+                                PathId_appAndPlatforms_Controller,
                                 heading: "Path Id",
-                                child: TextFormField(
-                                  controller:
-                                      PathId_ConvertorForTRCSRC_Controller,
-                                  textInputAction: TextInputAction.next,
-                                  style: TextStyle(color: Colors.black),
-                                  decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      hintText: 'Id',
-                                      hintStyle:
-                                          TextStyle(color: Colors.black)),
-                                )),
+                                hintText: 'Id',
+                            ),
                           ),
                         ],
                       ),
@@ -974,14 +956,14 @@ class _ProjectCreatorState extends State<ProjectCreator> {
                         children: [
                           Expanded(
                               child: Uploader(
-                            type: FileType.any,
-                            path: "project",
-                            getIVF: (IVFData) {
-                              setState(() {
-                                IVF_appAndPlatforms = IVFData.first;
-                              });
-                            },
-                          )),
+                                type: FileType.any,
+                                path: "project",
+                                getIVF: (IVFData) {
+                                  setState(() {
+                                    IVF_ConvertorForTRCSRC = IVFData.first;
+                                  });
+                                },
+                              )),
                           InkWell(
                             child: Container(
                               padding: EdgeInsets.symmetric(
@@ -1004,59 +986,52 @@ class _ProjectCreatorState extends State<ProjectCreator> {
                                   appAndPlatforms[selectedConvertorForTRCSRC] =
                                       ConvertorForTRCSRC(
                                           heading:
-                                              Heading_ConvertorForTRCSRC_Controller
-                                                  .text,
+                                          Heading_appAndPlatforms_Controller
+                                              .text,
                                           path: Path(
                                               path:
-                                                  PathName_ConvertorForTRCSRC_Controller
-                                                      .text,
-                                              id: PathId_ConvertorForTRCSRC_Controller
+                                              PathName_appAndPlatforms_Controller
+                                                  .text,
+                                              id: PathId_appAndPlatforms_Controller
                                                   .text),
-                                          IVF: IVF_appAndPlatforms != null
-                                              ? IVF_appAndPlatforms!
-                                              : IVFUploader(
-                                                  type: "",
-                                                  file_url: "",
-                                                  file_name: "",
-                                                  size: "",
-                                                  file_messageId: 0,
-                                                  thumbnail_url: "",
-                                                  thumbnail_messageId: 0));
+                                          ivf: IVF_ConvertorForTRCSRC != null
+                                              ? IVF_ConvertorForTRCSRC!
+                                              : FileUploader(
+                                              type: "",
+                                              fileUrl: "",
+                                              fileName: "",
+                                              size: "",
+                                              fileMessageId: 0,
+                                              thumbnailUrl: "",
+                                              thumbnailMessageId: 0));
                                 } else
                                   appAndPlatforms.add(ConvertorForTRCSRC(
                                       heading:
-                                          Heading_ConvertorForTRCSRC_Controller
-                                              .text,
+                                      Heading_appAndPlatforms_Controller
+                                          .text,
                                       path: Path(
                                           path:
-                                              PathName_ConvertorForTRCSRC_Controller
-                                                  .text,
-                                          id: PathId_ConvertorForTRCSRC_Controller
+                                          PathName_appAndPlatforms_Controller
+                                              .text,
+                                          id: PathId_appAndPlatforms_Controller
                                               .text),
-                                      IVF: IVF_appAndPlatforms != null
-                                          ? IVF_appAndPlatforms!
-                                          : IVFUploader(
-                                              type: "",
-                                              file_url: "",
-                                              file_name: "",
-                                              size: "",
-                                              file_messageId: 0,
-                                              thumbnail_url: "",
-                                              thumbnail_messageId: 0)));
+                                      ivf: IVF_ConvertorForTRCSRC != null
+                                          ? IVF_ConvertorForTRCSRC!
+                                          : FileUploader(
+                                          type: "",
+                                          fileUrl: "",
+                                          fileName: "",
+                                          size: "",
+                                          fileMessageId: 0,
+                                          thumbnailUrl: "",
+                                          thumbnailMessageId: 0)));
                                 selectedConvertorForTRCSRC = -1;
-                                IVF_appAndPlatforms = IVFUploader(
-                                    type: "",
-                                    file_url: "",
-                                    file_name: "",
-                                    size: "",
-                                    file_messageId: 0,
-                                    thumbnail_url: "",
-                                    thumbnail_messageId: 0);
+                                IVF_ConvertorForTRCSRC = null;
                               });
 
-                              Heading_ConvertorForTRCSRC_Controller.clear();
-                              PathName_ConvertorForTRCSRC_Controller.clear();
-                              PathId_ConvertorForTRCSRC_Controller.clear();
+                              Heading_appAndPlatforms_Controller.clear();
+                              PathName_appAndPlatforms_Controller.clear();
+                              PathId_appAndPlatforms_Controller.clear();
                             },
                           )
                         ],
@@ -1144,20 +1119,20 @@ class _ProjectCreatorState extends State<ProjectCreator> {
                   onTap: () {
                     String id = getID();
                     createProject(
-                        displayHere:[],
-                        thumbnail:IVFUploader(
+                        displayHere: [],
+                        thumbnail: IVF_Thumbnail!=null?IVF_Thumbnail!:FileUploader(
                             type: "",
-                            file_url: "",
-                            file_name: "",
+                            fileUrl: "",
+                            fileName: "",
                             size: "",
-                            file_messageId: 0,
-                            thumbnail_url: "",
-                            thumbnail_messageId: 0),
+                            fileMessageId: 0,
+                            thumbnailUrl: "",
+                            thumbnailMessageId: 0),
                         isContainsAds: isContainsAds,
                         isFree: isFree,
                         id: widget.data == null ? id : widget.data!.id,
                         type: TypeController.text,
-                        youtubeUrl: YoutubeLinkController.text,
+
                         isUpdate: widget.data != null ? true : false,
                         heading: HeadingConvertor(
                             full: HeadingLastController.text,
@@ -1169,35 +1144,35 @@ class _ProjectCreatorState extends State<ProjectCreator> {
                         appAndPlatforms: appAndPlatforms,
                         toolsRequired: toolsRequired,
                         description: descriptionList,
-                        images: iv);
+                        images: IVF_Images, youtubeData: youtubeData);
 
                     Navigator.pop(context);
                   },
                   child: widget.data == null
                       ? Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            color: Colors.white.withOpacity(0.5),
-                            border: Border.all(color: Colors.white),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                                left: 10, right: 10, top: 5, bottom: 5),
-                            child: Text("Create"),
-                          ),
-                        )
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: Colors.white.withOpacity(0.5),
+                      border: Border.all(color: Colors.white),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 10, right: 10, top: 5, bottom: 5),
+                      child: Text("Create"),
+                    ),
+                  )
                       : Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            color: Colors.white.withOpacity(0.5),
-                            border: Border.all(color: Colors.white),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                                left: 10, right: 10, top: 5, bottom: 5),
-                            child: Text("Update"),
-                          ),
-                        ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: Colors.white.withOpacity(0.5),
+                      border: Border.all(color: Colors.white),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 10, right: 10, top: 5, bottom: 5),
+                      child: Text("Update"),
+                    ),
+                  ),
                 ),
                 SizedBox(
                   width: 20,
@@ -1213,8 +1188,8 @@ class _ProjectCreatorState extends State<ProjectCreator> {
     );
   }
 
-  Widget convertorForTRCSRCContainer(
-      ConvertorForTRCSRC data, int mode, int index) {
+  Widget convertorForTRCSRCContainer(ConvertorForTRCSRC data, int mode,
+      int index) {
     return Column(
       children: [
         Row(
@@ -1232,7 +1207,7 @@ class _ProjectCreatorState extends State<ProjectCreator> {
                       style: TextStyle(fontSize: 18),
                     ),
                     Text(
-                      "IVF : ${data.IVF.file_name}",
+                      "IVF : ${data.ivf.fileName}",
                       style: TextStyle(fontSize: 10),
                     ),
                     Text(
@@ -1249,16 +1224,33 @@ class _ProjectCreatorState extends State<ProjectCreator> {
                     onTap: () {
                       setState(() {
                         selectedConvertorForTRCSRC = index;
-                        if (mode == 2) {
-                          Heading_ConvertorForTRCSRC_Controller.text =
+                        if (mode == 0) {
+                          Heading_appAndPlatforms_Controller.text =
                               appAndPlatforms[index].heading;
-                          PathName_ConvertorForTRCSRC_Controller.text =
+                          PathName_appAndPlatforms_Controller.text =
                               appAndPlatforms[index].path.path;
                           ;
-                          PathId_ConvertorForTRCSRC_Controller.text =
+                          PathId_appAndPlatforms_Controller.text =
                               appAndPlatforms[index].path.id;
                           ;
-                          IVF_appAndPlatforms = appAndPlatforms[index].IVF;
+                        }else if(mode == 1){
+                          Heading_ComponentsAndSupplies_Controller.text =
+                              ComponentsAndSupplies[index].heading;
+                          PathName_ComponentsAndSupplies_Controller.text =
+                              ComponentsAndSupplies[index].path.path;
+                          ;
+                          PathId_ComponentsAndSupplies_Controller.text =
+                              ComponentsAndSupplies[index].path.id;
+                          ;
+                        }else if(mode == 2){
+                          Heading_toolsRequired_Controller.text =
+                              toolsRequired[index].heading;
+                          PathName_toolsRequired_Controller.text =
+                              toolsRequired[index].path.path;
+                          ;
+                          PathId_toolsRequired_Controller.text =
+                              toolsRequired[index].path.id;
+                          ;
                         }
                       });
                     },
@@ -1270,10 +1262,10 @@ class _ProjectCreatorState extends State<ProjectCreator> {
                     onTap: () {
                       setState(() {
                         if (mode == 2) {
-
-
-                          deleteFileFromTelegramBot(appAndPlatforms[index].IVF.file_messageId);
-                          deleteFileFromTelegramBot(appAndPlatforms[index].IVF.thumbnail_messageId);
+                          deleteFileFromTelegramBot(
+                              appAndPlatforms[index].ivf.fileMessageId);
+                          deleteFileFromTelegramBot(
+                              appAndPlatforms[index].ivf.thumbnailMessageId);
                           appAndPlatforms.removeAt(index);
                         }
                       });

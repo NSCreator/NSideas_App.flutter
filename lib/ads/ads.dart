@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/widgets.dart';
 
 import 'dart:io';
 
@@ -9,6 +11,129 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../home_page/home_page.dart';
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+
+class HomePageAd {
+  final BuildContext context;
+  late RewardedAd rewardedAd;
+  bool adPlayedSuccessfully = false;
+  String type;
+
+  HomePageAd(this.context, {required this.type});
+
+  void showLoadingIndicator() {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent dismissing the dialog by tapping outside
+      builder: (context) => AlertDialog(
+        title: Text("Loading"),
+        content: Center(child: CircularProgressIndicator()),
+      ),
+    );
+  }
+
+  void hideLoadingIndicator() {
+    Navigator.of(context).pop();
+  }
+
+  void _setFullScreenContentCallback() {
+    rewardedAd.fullScreenContentCallback = FullScreenContentCallback(
+      onAdShowedFullScreenContent: (RewardedAd ad) {
+        print("$ad onAdShowedFullScreenContent");
+        adPlayedSuccessfully = false;
+      },
+      onAdDismissedFullScreenContent: (RewardedAd ad) {
+        print("$ad onAdDismissedFullScreenContent");
+        ad.dispose();
+        adPlayedSuccessfully = true;
+      },
+      onAdFailedToShowFullScreenContent: (RewardedAd ad, AdError error) {
+        print("$ad onAdFailedToShowFullScreenContent: $error");
+        ad.dispose();
+        adPlayedSuccessfully = false;
+      },
+      onAdImpression: (RewardedAd ad) => print("$ad Impression occurred"),
+    );
+  }
+
+  Future<void> _showRewardedAd() async {
+    rewardedAd.show(
+      onUserEarnedReward: (AdWithoutView ad, RewardItem rewardItem) {
+        num amount = rewardItem.amount;
+
+      },
+    );
+  }
+
+  Future<bool> _loadRewardedAd() async {
+    final Completer<bool> adLoadCompleter = Completer<bool>();
+
+    RewardedAd.load(
+      adUnitId: AdVideo.bannerAdUnitId,
+      request: const AdRequest(),
+      rewardedAdLoadCallback: RewardedAdLoadCallback(
+        onAdFailedToLoad: (LoadAdError error) {
+          print("Failed to load rewarded ad, Error: $error");
+          adLoadCompleter.complete(false);
+
+        },
+        onAdLoaded: (RewardedAd ad) async {
+          print("$ad loaded");
+          showToastText("Ad loaded");
+          rewardedAd = ad;
+          _setFullScreenContentCallback();
+          await _showRewardedAd();
+          adLoadCompleter.complete(true);
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setInt(type, DateTime.now().millisecondsSinceEpoch);
+        },
+      ),
+    );
+
+    return adLoadCompleter.future;
+  }
+
+  Future<bool> _checkImageOpenStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    int? lastOpenTime = prefs.getInt(type);
+
+    if (lastOpenTime == null) {
+
+      return await _loadRewardedAd();
+
+    } else {
+      final currentTime = DateTime.now().millisecondsSinceEpoch;
+      final difference = (currentTime - lastOpenTime) ~/ 1000;
+
+      if (difference >= 43200) {
+
+        return await _loadRewardedAd();
+      } else {
+        double remainingTime = ((43200 - difference) / 60) / 60;
+        showToastText("Ad within ${remainingTime.round()} Hours");
+        return true;
+      }
+    }
+
+  }
+
+  Future<bool> startAdLoading() async {
+    try {
+      showLoadingIndicator();
+      bool ad= await _checkImageOpenStatus();
+      hideLoadingIndicator();
+      return ad;
+    } catch (e) {
+      print("Error loading ad: $e");
+
+      return false;
+    }
+  }
+}
 
 class AdVideo {
   static String get bannerAdUnitId {
@@ -20,86 +145,6 @@ class AdVideo {
   }
 }
 
-HomePageAd(){
-  late final RewardedAd rewardedAd;
-  void _setFullScreenContentCallback() {
-    rewardedAd.fullScreenContentCallback = FullScreenContentCallback(
-      //when ad  shows fullscreen
-      onAdShowedFullScreenContent: (RewardedAd ad) =>
-          print("$ad onAdShowedFullScreenContent"),
-      //when ad dismissed by user
-      onAdDismissedFullScreenContent: (RewardedAd ad) {
-        print("$ad onAdDismissedFullScreenContent");
-
-        //dispose the dismissed ad
-        ad.dispose();
-      },
-      //when ad fails to show
-      onAdFailedToShowFullScreenContent: (RewardedAd ad, AdError error) {
-        print("$ad  onAdFailedToShowFullScreenContent: $error ");
-        //dispose the failed ad
-        ad.dispose();
-      },
-
-      //when impression is detected
-      onAdImpression: (RewardedAd ad) => print("$ad Impression occured"),
-    );
-  }
-
-  Future<void> _showRewardedAd() async {
-    rewardedAd.show(
-        onUserEarnedReward: (AdWithoutView ad, RewardItem rewardItem) {
-          num amount = rewardItem.amount;
-          showToastText("You earned: $amount");
-        });
-  }
-
-  void _loadRewardedAd() {
-    RewardedAd.load(
-      adUnitId: AdVideo.bannerAdUnitId,
-      request: const AdRequest(),
-      rewardedAdLoadCallback: RewardedAdLoadCallback(
-        onAdFailedToLoad: (LoadAdError error) {
-          print("Failed to load rewarded ad, Error: $error");
-        },
-        onAdLoaded: (RewardedAd ad) async {
-          print("$ad loaded");
-          showToastText("Ad loaded");
-          rewardedAd = ad;
-          _setFullScreenContentCallback();
-          await _showRewardedAd();
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          prefs.setInt('lastOpenAdTime', DateTime.now().millisecondsSinceEpoch);
-        },
-      ),
-    );
-  }
-
-
-  double remainingTime = 0;
-
-
-  Future<void> _checkImageOpenStatus() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    int? lastOpenTime = prefs.getInt('lastOpenAdTime');
-
-    if (lastOpenTime == null) {
-      _loadRewardedAd();
-    } else {
-      final currentTime = DateTime.now().millisecondsSinceEpoch;
-      final difference = (currentTime - lastOpenTime) ~/ 1000;
-
-      if (difference >= 43200) {
-        _loadRewardedAd();
-      } else {
-        remainingTime = ((43200 - difference) / 60)/60;
-        showToastText("Ad with in ${remainingTime.toInt()} Hours");
-      }
-    }
-  }
-  _checkImageOpenStatus();
-}
 class CustomAdsBannerForPdfs extends StatefulWidget {
   CustomAdsBannerForPdfs();
 

@@ -535,15 +535,8 @@ class _PaymentPageState extends State<PaymentPage> {
                     //   PhotoUrlController.text = val.first;
                     // }, type: FileType.image),
                     TextFieldContainer(
-                      child: TextFormField(
-                        controller: tidController,
-                        textInputAction: TextInputAction.next,
-                        style: textFieldStyle(),
-                        decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: 'Enter Transaction Id',
-                            hintStyle: textFieldHintStyle()),
-                      ),
+                      controller: tidController,
+                      hintText: 'Enter Transaction Id',
                       heading: 'Transaction Id',
                     ),
                     InkWell(

@@ -1,9 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:nsideas/board/sub_page.dart';
 
 import '../functions.dart';
+import '../home_page/home_page.dart';
 import 'converter.dart';
+import 'creator.dart';
 
 class Boards extends StatelessWidget {
   String boardName;
@@ -27,7 +30,7 @@ class Boards extends StatelessWidget {
                 "Boards",
                 style: TextStyle(
                   fontSize: 25.0,
-                  color: Colors.black,
+                  color: Colors.white,
                   fontWeight: FontWeight.w500,
                 ),
                 maxLines: 1,
@@ -44,30 +47,56 @@ class Boards extends StatelessWidget {
               itemCount: boards.length,
               shrinkWrap: true,
               itemBuilder: (BuildContext context, int index) {
-                final SubjectsData = boards[index];
+                final data = boards[index];
 
                 return InkWell(
-                  child: Column(
+                  child:Column(
                     children: [
                       Expanded(
-                        child: Container(
+                        child: data.thumbnail.fileUrl.isNotEmpty
+                            ? Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius:
+                              BorderRadius.all(Radius.circular(20)),
+                            ),
+
+                            alignment: Alignment.center,
+                            child: ClipRRect(
+                              borderRadius:
+                              BorderRadius.all(Radius.circular(20)),
+                              child: ImageShowAndDownload(
+                                image: data.thumbnail.fileUrl,
+                                id: data.id,
+                              ),
+                            )
+
+                        )
+                            : Container(
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.05),
-                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                            color: Colors.white.withOpacity(0.03),
+                            borderRadius:
+                            BorderRadius.all(Radius.circular(20)),
                           ),
-                alignment: Alignment.center,
-                          child: SubjectsData.images.isNotEmpty
+                          alignment: Alignment.center,
+                          child: data.thumbnail.fileUrl.isNotEmpty
                               ? ImageShowAndDownload(
-                                  image: SubjectsData.images.first,
-                                  id: SubjectsData.id,
-                                )
-                              : Text("No Image",style: TextStyle(color: Colors.black.withOpacity(0.15),fontSize: 20),),
+                            image: data.thumbnail.fileUrl,
+                            id: data.id,
+                          )
+                              : Text(
+                            "No Image",
+                            style: TextStyle(
+                                color:
+                                Colors.white.withOpacity(0.15),
+                                fontSize: 20),
+                          ),
                         ),
                       ),
                       Text(
-                        SubjectsData.heading.full,
+                        data.heading.short,
                         style: TextStyle(
-                          fontSize: 20,
+                            fontSize: 20,color: Colors.white
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -80,8 +109,8 @@ class Boards extends StatelessWidget {
                       PageRouteBuilder(
                         transitionDuration: const Duration(milliseconds: 300),
                         pageBuilder: (context, animation, secondaryAnimation) =>
-                            arduinoBoard(
-                          data: SubjectsData,
+                            Board(
+                          data: data,
                         ),
                         transitionsBuilder:
                             (context, animation, secondaryAnimation, child) {

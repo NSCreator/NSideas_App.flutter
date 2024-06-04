@@ -32,88 +32,43 @@ class _addressCreatorState extends State<addressCreator> {
             children: [
               backButton(),
               TextFieldContainer(
-                child: TextFormField(
-                  controller: phoneNoController,
-                  textInputAction: TextInputAction.next,
-                  style: textFieldStyle(),
-                  decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: 'Phone Number (+91 only)',
-                      hintStyle: textFieldHintStyle()),
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                ),heading: "Phone Number (+91 only)",),
+                controller: phoneNoController,
+                hintText: 'Phone Number (+91 only)',
+
+                heading: "Phone Number (+91 only)",),
 
               TextFieldContainer(
-                child: TextFormField(
-                  controller: street1Controller,
+                controller: street1Controller,
+                hintText: 'Street 1',
 
-                  textInputAction: TextInputAction.next,
-                  style: textFieldStyle(),
-                  decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: 'Street 1',
-                      hintStyle: textFieldHintStyle()),
 
-                ),
                 heading: "Street 1",
               ),
                 TextFieldContainer(
-                    child: TextFormField(
-                      controller: Street2Controller,
-                      textInputAction: TextInputAction.next,
-                      style: textFieldStyle(),
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: 'Street 2',
-                          hintStyle: textFieldHintStyle()),
-                    ),heading: "Street 2",),
+                  controller: Street2Controller,
+                  hintText: 'Street 2',
+                  heading: "Street 2",),
 
                 TextFieldContainer(
-                    child: TextFormField(
-                      controller: NearByController,
-                      textInputAction: TextInputAction.next,
-                      style: textFieldStyle(),
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: 'Near By',
-                          hintStyle: textFieldHintStyle()),
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                    ),heading: "Near By",),
+                  controller: NearByController,
+                  hintText: 'Near By',
+
+                   heading: "Near By",),
 
                 TextFieldContainer(
-                  child: TextFormField(
-                    controller: cityController,
-                    textInputAction: TextInputAction.next,
-                    style: textFieldStyle(),
-                    decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: 'City',
-                        hintStyle: textFieldHintStyle()),
-                  ),heading: "City",),
-                TextFieldContainer(
-                    child: TextFormField(
-                      controller: stateController,
-                      textInputAction: TextInputAction.next,
-                      style: textFieldStyle(),
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: 'State',
-                        hintStyle: textFieldHintStyle(),
-                      ),
+                  controller: cityController,
+                  hintText: 'City',
 
-                    ),heading: "State",),
+                  heading: "City",),
+                TextFieldContainer(
+                  controller: stateController,
+                  hintText: 'State',
+
+                   heading: "State",),
               TextFieldContainer(
-                    child: TextFormField(
-                      controller: zipController,
-                      textInputAction: TextInputAction.next,
-                      style: textFieldStyle(),
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: 'zip',
-                        hintStyle: textFieldHintStyle(),
-                      ),
-
-                    ),heading: "zip",),
+                controller: zipController,
+                hintText: 'zip',
+                heading: "zip",),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
