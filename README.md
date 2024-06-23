@@ -1,4 +1,5 @@
-# NS Ideas (Owner Version)
+# NS Ideas (Owner Version) -- its free Login with Guest Role
+PlayStore Url : https://play.google.com/store/apps/details?id=com.nimmalasujith.nsideas&hl=en_US
 <h2>This project is my personal initiative to help students by providing various types Electronic board, sensors, Components and Projects.</h2>
 <h3>All code files are in the 'lib' folder.</h3>
 
