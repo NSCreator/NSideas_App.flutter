@@ -21,7 +21,4 @@ PlayStore Url : https://play.google.com/store/apps/details?id=com.nimmalasujith.
 <img src="https://github.com/NSCreator/NSideas_App.flutter/assets/92940655/f5285f70-4b68-422a-aa43-993f3a5fe95a" height="350">        <img src="https://github.com/NSCreator/NSideas_App.flutter/assets/92940655/a54bce6c-104a-44cc-b4b8-763a9b5225a2" height="350">        <img src="https://github.com/NSCreator/NSideas_App.flutter/assets/92940655/c4078177-99cd-464b-951d-70a11e71657d" height="350">
 
 <h2>Settings Page (Owner Mode)</h2>
-<img src="https://github.com/NSCreator/NSideas_App.flutter/assets/92940655/c97263fb-e6fd-4de0-9e18-8bae52cceb22" height="350">        <img src="https://github.com/NSCreator/eSRKR_App/assets/92940655/b04fc560-454e-407c-a4c5-a34e6a50b880" height="350">        <img src="https://github.com/NSCreator/eSRKR_App/assets/92940655/51920c70-0855-465d-b3e2-15a1447c9a58" height="350">
-
-<h2>Remaining...</h2>
-<img src="https://github.com/NSCreator/eSRKR_App/assets/92940655/568d7cb7-ef3d-467a-98db-4884616eb651" height="350">
+<img src="https://github.com/NSCreator/NSideas_App.flutter/assets/92940655/c97263fb-e6fd-4de0-9e18-8bae52cceb22" height="350"> 
